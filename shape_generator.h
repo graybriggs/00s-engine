@@ -27,6 +27,10 @@ public:
 	static ShapeData makeRectangle();
 	static ShapeData makeQuad();
 	static ShapeData makeCube();
+	static ShapeData makeCircle(int subdivisions = 5);
+	static ShapeData makeSphere(int subdivisions = 5);
+	static ShapeData makeCone(int subdivisions = 5);
+	static ShapeData makeTorus();
 	static ShapeData makePlane(int dimensions, GLfloat step = 1.0f);
 	static ShapeData makeModel(const char* path);
 
