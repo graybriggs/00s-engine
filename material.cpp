@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include <vector>
 
 #include <GL/glew.h>
@@ -15,6 +16,7 @@ Material::Material(GLuint vertex_shader_id, GLuint fragment_shader_id) {
 	program_id = glCreateProgram();
 	glAttachShader(program_id, vertex_shader_id);
 	glAttachShader(program_id, fragment_shader_id);
+    glLinkProgram(program_id);
     
 	GLint result = GL_FALSE;
 	int info_log_length;
@@ -27,12 +29,11 @@ Material::Material(GLuint vertex_shader_id, GLuint fragment_shader_id) {
 		printf("%s\n", &err_msg[0]);
 	}
 
-    // glDetachShader(program_id,vertex_shader_id);
-	// glDetachShader(program_id, fragment_shader_id);
+    glDetachShader(program_id, vertex_shader_id);
+	glDetachShader(program_id, fragment_shader_id);
 
-	// glDeleteShader(vertex_shader_id);
-	// glDeleteShader(fragment_shader_id);
-
+	glDeleteShader(vertex_shader_id);
+	glDeleteShader(fragment_shader_id);
 }
 
 GLuint Material::handle() {
