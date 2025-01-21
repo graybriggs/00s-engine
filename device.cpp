@@ -3,10 +3,11 @@
 #include "video.h"
 
 #include <exception>
+#include <string>
 
-#include <glew.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
 
@@ -24,9 +25,6 @@ bool Device::run() {
 std::unique_ptr<VideoDriver> Device::getVideoDriver() {
 	
 	auto video = std::make_unique<VideoDriver>();
-
-	video->window = window;
-
 	return video;
 }
 
@@ -46,7 +44,8 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 	if (!glfwInit())
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
-		throw std::exception("failed to initialize glfw");
+		//throw std::exception("blah");  // constructor of std::exception does not take a c string as an argument.
+		// This must have worked before because of a non-standard, non-portable extension in visual studio
 	}
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
@@ -60,14 +59,22 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 	if (device->window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
 		glfwTerminate();
-		throw std::exception("failed to open GLFW window.");
+		//throw std::exception("failed to open GLFW window.");
 	}
 	glfwMakeContextCurrent(device->window); // Initialize GLEW
 	glewExperimental = true; // Needed in core profile
 	if (glewInit() != GLEW_OK) {
 		fprintf(stderr, "Failed to initialize GLEW\n");
-		throw std::exception("failed to initialize glew");
+		//throw std::exception("failed to initialize glew");
 	}
 
 	return device;
+}
+
+void Device::window_swap() {
+	glfwSwapBuffers(window);
+}
+
+void Device::poll_events() {
+	glfwPollEvents();
 }

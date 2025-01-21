@@ -1,8 +1,8 @@
 #pragma once
 
-#include <glew.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
 
@@ -19,6 +19,9 @@ public:
 
 	std::unique_ptr<VideoDriver> getVideoDriver();
 	std::unique_ptr<Timer> getTimer();
+
+	void window_swap();
+	void poll_events();
 
 
 public:
