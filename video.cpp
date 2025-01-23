@@ -69,15 +69,16 @@ void VideoDriver::renderer(const Camera& camera) {
 		// glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, glm::value_ptr(camera.get_projection()));
 
 		glm::mat4 model_matrix = ent->get_model_matrix();
+		GLuint handle = ent->get_material().handle();
 		GLuint idx_count = ent->get_mesh()->get_index_count();
 
 		glUseProgram(ent->get_material().handle());
-		GLuint shader_id_model = glGetUniformLocation(ent->get_material().handle(), "model");
+		GLuint shader_id_model = glGetUniformLocation(handle, "model");
 		glUniformMatrix4fv(shader_id_model, 1, GL_FALSE, &model_matrix[0][0]);
-		GLuint shader_id_view = glGetUniformLocation(ent->get_material().handle(), "view");
+		GLuint shader_id_view = glGetUniformLocation(handle, "view");
 		//glUniformMatrix4fv(shader_id_view, 1, GL_FALSE, &view_matrix[0][0]);
 		glUniformMatrix4fv(shader_id_view, 1, GL_FALSE, glm::value_ptr(camera.get_view()));
-		GLuint shader_id_projection = glGetUniformLocation(ent->get_material().handle(), "projection");
+		GLuint shader_id_projection = glGetUniformLocation(handle, "projection");
 		//glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, &projection_matrix[0][0]);
 		glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, glm::value_ptr(camera.get_projection()));
 		
