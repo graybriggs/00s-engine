@@ -1,11 +1,22 @@
 #pragma once
 
+#include <vector>
 
-#include <glew.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
+#include "camera.h"
+#include "mesh.h"
+
+class Entity;
+class Material;
+class MeshTriangle;
 
 class VideoDriver {
 public:
@@ -13,11 +24,16 @@ public:
 	void beginScene();
 	void endScene();
 
-	void drawAll();
+	// this will be Instance
+	//void add_mesh(Mesh* mesh);
+	void add_entity(Entity* entity);
 
-public:
+	//void renderer(const Camera& camera, Mesh* mesh, Material& material, const glm::mat4& model_matrix);
+	void renderer(const Camera& camera);
 
-	GLFWwindow* window; // GET RID OF THIS SOMEHOW
+private:
 
+	//std::vector<Mesh*> mesh_list;
+	std::vector<Entity*> render_queue;
 };
 
