@@ -21,6 +21,8 @@ class MeshTriangle;
 class VideoDriver {
 public:
 
+	void setup();
+
 	void beginScene();
 	void endScene();
 

@@ -15,6 +15,12 @@
 #include <glm/ext.hpp>
 
 
+void VideoDriver::setup() {
+	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEBUG_OUTPUT);
+	glDepthFunc(GL_LESS);
+}
 
 void VideoDriver::beginScene() {
 
