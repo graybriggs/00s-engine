@@ -23,8 +23,10 @@ public:
 	void window_swap();
 	void poll_events();
 
+	void set_window(GLFWwindow* win);
+	GLFWwindow* get_window();
 
-public:
+private:
 	GLFWwindow* window;
 
 };

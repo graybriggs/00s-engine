@@ -1,5 +1,6 @@
 
 #include "device.h"
+#include "timer.h"
 #include "video.h"
 
 #include <exception>
@@ -10,8 +11,6 @@
 #include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
-
-#include "timer.h"
 
 bool Device::run() {
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
@@ -55,13 +54,14 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 
 
 	
-	device->window = glfwCreateWindow(screen_w, screen_h, "ogl", NULL, NULL);
-	if (device->window == NULL) {
+	GLFWwindow* window = glfwCreateWindow(screen_w, screen_h, "ogl", NULL, NULL);
+	device->set_window(window);
+	if (device->get_window() == nullptr) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
 		glfwTerminate();
 		//throw std::exception("failed to open GLFW window.");
 	}
-	glfwMakeContextCurrent(device->window); // Initialize GLEW
+	glfwMakeContextCurrent(device->get_window()); // Initialize GLEW
 	glewExperimental = true; // Needed in core profile
 	if (glewInit() != GLEW_OK) {
 		fprintf(stderr, "Failed to initialize GLEW\n");
@@ -77,4 +77,13 @@ void Device::window_swap() {
 
 void Device::poll_events() {
 	glfwPollEvents();
+}
+
+
+void Device::set_window(GLFWwindow* win) {
+	window = win;
+}
+
+GLFWwindow* Device::get_window() {
+	return window;
 }
