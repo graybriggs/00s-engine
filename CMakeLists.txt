@@ -18,12 +18,17 @@ add_definitions(${OpenGL_DEFINITIONS})
 find_package(glfw3 3.3 REQUIRED)
 
 add_executable(a
+    camera.cpp
     controls.cpp
     cube.cpp
     device.cpp
+    entity.cpp
+    input.cpp
     main.cpp
     material.cpp
     mesh.cpp
+    mesh_cube.cpp
+    mesh_triangle.cpp
     shader.cpp
     shape_generator.cpp
     video.cpp
