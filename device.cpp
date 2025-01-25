@@ -1,9 +1,11 @@
 
 #include "device.h"
+#include "input.h"
 #include "timer.h"
 #include "video.h"
 
 #include <exception>
+#include <iostream>
 #include <string>
 
 #include <GL/glew.h>
@@ -68,6 +70,9 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 		//throw std::exception("failed to initialize glew");
 	}
 
+	glfwSetInputMode(device->get_window(), GLFW_STICKY_KEYS, GL_TRUE);
+	glfwSetKeyCallback(device->get_window(), key_callback);
+
 	return device;
 }
 
@@ -79,6 +84,11 @@ void Device::poll_events() {
 	glfwPollEvents();
 }
 
+void Device::set_input(Input* in) {
+	//input = in;
+
+	glfwSetWindowUserPointer(window, static_cast<void*>(in));
+}
 
 void Device::set_window(GLFWwindow* win) {
 	window = win;
@@ -86,4 +96,47 @@ void Device::set_window(GLFWwindow* win) {
 
 GLFWwindow* Device::get_window() {
 	return window;
+}
+
+
+// private function
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+
+	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+		std::cout << "w\n";
+		input->key[0] = true;
+	}
+	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+		std::cout << "a\n";
+		input->key[1] = true;
+	}
+	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+		std::cout << "s\n";
+		input->key[2] = true;
+	}
+	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+		std::cout << "d\n";
+		input->key[3] = true;
+	}
+
+
+
+	if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
+		std::cout << "w\n";
+		input->key[0] = false;
+	}
+	if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+		std::cout << "a\n";
+		input->key[1] = false;
+	}
+	if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+		std::cout << "s\n";
+		input->key[2] = false;
+	}
+	if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+		std::cout << "d\n";
+		input->key[3] = false;
+	}
 }
