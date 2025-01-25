@@ -31,6 +31,7 @@ add_executable(a
     mesh_triangle.cpp
     shader.cpp
     shape_generator.cpp
+    timer.cpp
     video.cpp
 )
 
