@@ -105,38 +105,53 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
 
 	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-		std::cout << "w\n";
-		input->key[0] = true;
+		input->key[static_cast<int>(Key::KeyPress::W)] = true;
 	}
 	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-		std::cout << "a\n";
-		input->key[1] = true;
+		input->key[static_cast<int>(Key::KeyPress::A)] = true;
 	}
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-		std::cout << "s\n";
-		input->key[2] = true;
+		input->key[static_cast<int>(Key::KeyPress::S)] = true;
 	}
 	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-		std::cout << "d\n";
-		input->key[3] = true;
+		input->key[static_cast<int>(Key::KeyPress::D)] = true;
 	}
-
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::UP)] = true;
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::DOWN)] = true;
+	}
+	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::LEFT)] = true;
+	}
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::RIGHT)] = true;
+	}
 
 
 	if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
-		std::cout << "w\n";
-		input->key[0] = false;
+		input->key[static_cast<int>(Key::KeyPress::W)] = false;
 	}
 	if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
-		std::cout << "a\n";
-		input->key[1] = false;
+		input->key[static_cast<int>(Key::KeyPress::A)] = false;
 	}
 	if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-		std::cout << "s\n";
-		input->key[2] = false;
+		input->key[static_cast<int>(Key::KeyPress::S)] = false;
 	}
 	if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
-		std::cout << "d\n";
-		input->key[3] = false;
+		input->key[static_cast<int>(Key::KeyPress::D)] = false;
+	}
+	if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::UP)] = false;
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::DOWN)] = false;
+	}
+	if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::LEFT)] = false;
+	}
+	if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::RIGHT)] = false;
 	}
 }
