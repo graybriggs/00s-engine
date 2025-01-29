@@ -16,7 +16,7 @@
 
 
 void VideoDriver::setup() {
-	
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_DEBUG_OUTPUT);
 	glDepthFunc(GL_LESS);
@@ -29,50 +29,13 @@ void VideoDriver::beginScene() {
 }
 
 void VideoDriver::endScene() {
-
-	//glfwSwapBuffers(window);
-	//glfwPollEvents(); // MOVE THIS OUT
 }
 
 
-// add instances to the render queue
-// instance class looks something likes
-// struct Instance {
-// ModelAsset* asset;
-// glm::mat4 model_transform;
-// }
-//void VideoDriver::add_mesh(Mesh* mesh) {
-void VideoDriver::add_entity(Entity* entity) {
-	render_queue.emplace_back(entity);
-}
+void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 
-/*
-A renderer needs a material and mesh
-Renderer renders an entity that contains both
-the material and mesh
-*/
 
-//void VideoDriver::renderer(const Camera& camera, Mesh* mesh, Material& material, const glm::mat4& model_matrix) {
-void VideoDriver::renderer(const Camera& camera) {
-	// glm::mat4 view_matrix = glm::lookAt(
-	// 	glm::vec3(0, 2, -15), // cam pos
-	// 	glm::vec3(0, 0, 0), // camera is looking at (origin)
-	// 	glm::vec3(0, 1, 0) // head up direction
-	// );
-
-	//glm::mat4 projection_matrix = glm::perspective(glm::radians(config::FOV), config::ASPECT_RATIO, 0.1f, 100.0f);
-
-	for (auto ent : render_queue) {
-
-		// glUseProgram(material.handle());
-		// GLuint shader_id_model = glGetUniformLocation(material.handle(), "model");
-		// glUniformMatrix4fv(shader_id_model, 1, GL_FALSE, &model_matrix[0][0]);
-		// GLuint shader_id_view = glGetUniformLocation(material.handle(), "view");
-		// //glUniformMatrix4fv(shader_id_view, 1, GL_FALSE, &view_matrix[0][0]);
-		// glUniformMatrix4fv(shader_id_view, 1, GL_FALSE, glm::value_ptr(camera.get_view()));
-		// GLuint shader_id_projection = glGetUniformLocation(material.handle(), "projection");
-		// //glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, &projection_matrix[0][0]);
-		// glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, glm::value_ptr(camera.get_projection()));
+	for (auto ent : scene.entities) {
 
 		glm::mat4 model_matrix = ent->get_model_matrix();
 		GLuint handle = ent->get_material().handle();

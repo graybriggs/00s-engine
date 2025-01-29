@@ -12,7 +12,7 @@
 #include <glm/gtx/transform.hpp>
 
 #include "camera.h"
-#include "mesh.h"
+#include "scene.h"
 
 class Entity;
 class Material;
@@ -26,16 +26,10 @@ public:
 	void beginScene();
 	void endScene();
 
-	// this will be Instance
-	//void add_mesh(Mesh* mesh);
-	void add_entity(Entity* entity);
-
-	//void renderer(const Camera& camera, Mesh* mesh, Material& material, const glm::mat4& model_matrix);
-	void renderer(const Camera& camera);
+	void renderer(const Camera& camera, const Scene& scene);
 
 private:
 
-	//std::vector<Mesh*> mesh_list;
-	std::vector<Entity*> render_queue;
+
 };
 
