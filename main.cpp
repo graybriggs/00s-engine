@@ -1,178 +1,159 @@
 
 #include <iostream>
 #include <cmath>
+#include <map>
+#include <memory>
 #include <vector>
 
-#include <glew.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "camera.h"
 #include "config.h"
+#include "device.h"
+#include "entity.h"
+#include "input.h"
+#include "material.h"
+#include "renderable_mesh.h"
+#include "mesh_cube.h"
+#include "mesh_quad.h"
+#include "mesh_triangle.h"
+#include "scene.h"
 #include "shader.h"
 #include "timer.h"
-#include "cube.h"
-#include "triangle.h"
-
-#include "device.h"
 #include "video.h"
+
 
 int main() {
 
 	auto device = makeDevice(config::SCREEN_W, config::SCREEN_H);
+	Input in;
+	device->set_input(&in);
 	auto video = device->getVideoDriver();
 
 	// Ensure we can capture the escape key being pressed below
-	glfwSetInputMode(device->window, GLFW_STICKY_KEYS, GL_TRUE);
-
+	//glfwSetInputMode(device->get_window(), GLFW_STICKY_KEYS, GL_TRUE);
+	//glfwSetKeyCallback(device->get_window(), key_callback);
 	
 	////////////////////////////
-	////////////////////////////
 
-	GLuint vertexArrayTriangle;
-	glGenVertexArrays(1, &vertexArrayTriangle);
-	glBindVertexArray(vertexArrayTriangle);
-
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	constexpr float FOV = 45.0f; // ? 100.0f;
+	video->setup();
 
 	/////////////////////////////
 
-	Triangle tri;
-	
-	GLuint vertexbuffertri = tri.prepare_vertex_data();
-	GLuint colorbuffertri = tri.prepare_color_data();
+	const auto vs = Shader("vs_texture.vert", ShaderType::VERTEX);
+	const auto fs = Shader("fs_texture.frag", ShaderType::FRAGMENT);
+	auto material = Material(vs.handle(), fs.handle());
+	auto tri_mesh = std::make_unique<RMeshTriangle>();
+	//auto cube_mesh = std::make_unique<RMeshCube>();
+	//auto quad_mesh = std::make_unique<RMeshQuad>();
 
-	Cube cube;
-	GLuint vertexbuffer = cube.prepare_vertex_data();
-	GLuint colorbuffer = cube.prepare_color_data();
+	// glm::mat4 mm_e1(1.0f);
+	// glm::mat4 mm_e2(1.0f);
+	// glm::mat4 mm_e3(1.0f);
+	// glm::mat4 mm_e4(1.0f);
+	// glm::mat4 mm_e5(1.0f);
+	// glm::mat4 mm_e6(1.0f);
 
-	GLuint programID = load_shaders("vs.vert","fs.frag");
+	// mm_e1 = glm::translate(mm_e1, glm::vec3(-2.0, -4.0, 0.0));
+	// mm_e2 = glm::translate(mm_e2, glm::vec3(0.0, -4.0, 0.0));
+	// mm_e3 = glm::translate(mm_e3, glm::vec3(2.0, -4.0, 0.0));
+	// mm_e4 = glm::translate(mm_e4, glm::vec3(-2.0, -4.0, -2.0));
+	// mm_e5 = glm::translate(mm_e5, glm::vec3(0.0, -4.0, -2.0));
+	// mm_e6 = glm::translate(mm_e6, glm::vec3(2.0, -4.0, -2.0));
 
-	glm::mat4 projection = glm::perspective(glm::radians(FOV), config::ASPECT_RATIO, 0.1f, 100.0f);
+
+	// Entity e1(cube_mesh.get(), material, mm_e1);
+	// Entity e2(tri_mesh.get(), material, mm_e2);
+	// Entity e3(tri_mesh.get(), material, mm_e3);
+	// Entity e4(tri_mesh.get(), material, mm_e4);
+	// Entity e5(cube_mesh.get(), material, mm_e5);
+	// Entity e6(cube_mesh.get(), material, mm_e6);
+
+	Scene scene;
+	// scene.entities.emplace_back(&e1);
+	// scene.entities.emplace_back(&e2);
+	// scene.entities.emplace_back(&e3);
+	// scene.entities.emplace_back(&e4);
+	// scene.entities.emplace_back(&e5);
+	// scene.entities.emplace_back(&e6);
+
+	double x = -32.0;
+	double z = -4.0;
+	for (int i = 0; i < 1024; ++i) {
+		glm::mat4 mm(1.0f);
+		mm = glm::translate(mm, glm::vec3(x, -4.0, z));
+		Entity* e = new Entity(tri_mesh.get(), material, mm);
+		scene.entities.emplace_back(e);
+		x += 2.0;
+		if (x > 32.0) {
+			x = -32.0;
+			z -= 2.0;
+		}
+	}
+
+	auto camera = Camera(
+		{0, 0, 15},
+		{0, 0, 0},
+		{0, 1, 0},
+		config::FOV,
+		config::SCREEN_W,
+		config::SCREEN_H,
+		0.1f,
+		100.0f
+	);
+	camera.set_input(&in);
+
+
+// -------------
 
 	Timer timer;
 	timer.start_timer();
-	   
+	double frame_start = timer.current_time();
+	double accumulator = 0.0;
+	double delta = 1.0 / config::FPS;
+
 	while (device->run()) {
 		
-		video->beginScene();
+		device->poll_events();
+
+		double current_time = timer.current_time();
+		double delta = current_time - frame_start;
+		frame_start = current_time;
 
 
-		glm::mat4 mvp;
-		glm::mat4 cube_view;
-		GLuint mvpID;
-
-		for (int i = 0; i < 2; ++i) {
-
-			double tf = timer.current_time() + i;
-
-			glm::mat4 model_cube_r = glm::mat4(1.0f);
-			model_cube_r *= glm::rotate(glm::mat4(1.0f), 1.75f*(float)tf, glm::vec3(1.0f, 0.0f, 0.0f));
-			model_cube_r *= glm::rotate(glm::mat4(1.0f), 1.75f*(float)tf, glm::vec3(0.0f, 1.0f, 0.0f));
-			model_cube_r *= glm::rotate(glm::mat4(1.0f), 1.75f*(float)tf, glm::vec3(0.0f, 0.0f, 1.0f));
-			glm::mat4 model_cube = glm::translate(model_cube_r, glm::vec3(std::sin(0.35f*timer.current_time())*2.0f,
-				std::cos(0.52f*timer.current_time())*2.0f, std::sin(0.7f*timer.current_time())*2.0f));
-			//glm::mat4 model_cube = model_cube_t * model_cube_r;
-
-			cube_view = glm::lookAt(
-				glm::vec3(0, 0, 10), // cam pos
-				glm::vec3(0, 0, 0), // camera is looking at (origin)
-				glm::vec3(0, 1, 0) // head up direction
-			);
-
-
-
-			mvp = projection * cube_view * model_cube;
-
-			glUseProgram(programID);
-
-			mvpID = glGetUniformLocation(programID, "mvp");
-			glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
-
-			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-			glVertexAttribPointer(
-				0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-				3,                  // size
-				GL_FLOAT,           // type
-				GL_FALSE,           // normalized?
-				0,                  // stride
-				(void*)0            // array buffer offset
-			);
-
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-			glVertexAttribPointer(
-				1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-				3,                  // size
-				GL_FLOAT,           // type
-				GL_FALSE,           // normalized?
-				0,                  // stride
-				(void*)0            // array buffer offset
-			);
-
-			glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-
+		if (accumulator > 0.2) {
+			accumulator = 0.2;
+			// update
 		}
-		///
-		glm::mat4 tri_view;
 
-		tri_view = glm::lookAt(
-			glm::vec3(0, 0, 10), // cam pos
-			glm::vec3(0, 0, 0), // camera is looking at (origin)
-			glm::vec3(0, 1, 0) // head up direction
-		);
+		accumulator -= delta;
+
+		camera.update();
+
+		video->begin_scene();
+
+
+		//glm::mat4 model_matrix = glm::mat4(1.0f);
+
+		//model_matrix_cube = glm::rotate(model_matrix_cube, -0.75f*(float)timer.current_time(), glm::vec3(0.0f, 0.0f, 1.0f));
+		//model_matrix_cube= glm::rotate(model_matrix_cube, -0.75f*(float)timer.current_time(), glm::vec3(0.0f, 1.0f, 0.0f));
+
 		
-		glm::mat4 model_tri = glm::mat4(1.0f);
-		
-		model_tri = glm::translate(model_tri, glm::vec3(4.0, 6.0, -15.0));
-		model_tri = glm::rotate(model_tri, -1.75f*(float)timer.current_time(), glm::vec3(0.0f, 0.0f, 1.0f));
-		mvp = projection * tri_view * model_tri;
 
-		glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
+		video->renderer(camera, scene);
+		//video->renderer(camera);
 
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffertri);
-		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
+		video->end_scene();
 
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colorbuffertri);
-		glVertexAttribPointer(
-			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
-
-		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-
-		video->endScene();
-
-
-		//glfwSwapBuffers(device->window);
-		//glfwPollEvents();
+		device->window_swap();
 
 	}
 	
-	/*
-	while (glfwGetKey(device->window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-		glfwWindowShouldClose(device->window) == 0);
-	*/
 }
