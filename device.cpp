@@ -1,6 +1,7 @@
 
 #include "device.h"
 #include "input.h"
+#include "key.h"
 #include "timer.h"
 #include "video.h"
 
@@ -56,7 +57,7 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 
 
 	
-	GLFWwindow* window = glfwCreateWindow(screen_w, screen_h, "ogl", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(screen_w, screen_h, "test", NULL, NULL);
 	device->set_window(window);
 	if (device->get_window() == nullptr) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
@@ -72,6 +73,8 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 
 	glfwSetInputMode(device->get_window(), GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetKeyCallback(device->get_window(), key_callback);
+	glfwSetCursorPosCallback(device->get_window(), cursor_position_callback);
+	glfwSetMouseButtonCallback(device->get_window(), mouse_button_callback);
 
 	return device;
 }
@@ -99,7 +102,6 @@ GLFWwindow* Device::get_window() {
 }
 
 
-// private function
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
@@ -153,5 +155,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
 		input->key[static_cast<int>(Key::KeyPress::RIGHT)] = false;
+	}
+}
+
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+
+	double x, y;
+	glfwGetCursorPos(window, &x, &y);
+	//printf("x: %f y: %f\n", x, y);
+	input->set_mouse_cursor(x, y);
+}
+
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		//printf("%i %i %i\n", button, action, mods);
+		input->set_left_mouse_click();
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		input->set_left_mouse_release();
 	}
 }

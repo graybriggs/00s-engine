@@ -137,7 +137,9 @@ void Camera::update(double delta) {
 	//glfwSetMousePos(config::SCREEN_W / 2, config::SCREEN_H / 2);
 	mouse_cursor_pos mouse_pos = input->get_cursor_pos();
 
-	printf("x: %f y: %f\n", mouse_pos.xpos, mouse_pos.ypos);
+	if (input->get_left_mouse_button_state()) {
+		printf("x: %f y: %f\n", mouse_pos.xpos, mouse_pos.ypos);
+	}
 
 
 	if (yaw >= 360) yaw = 0.0f;
