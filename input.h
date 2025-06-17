@@ -2,11 +2,20 @@
 
 #include <array>
 
+
+
+struct mouse_cursor_pos {
+    double xpos;
+    double ypos;
+};
+
 class Input {
 public:
-
+    
     Input();
-
+    void set_mouse_cursor(double x, double y);
+    mouse_cursor_pos get_cursor_pos();
 //private:
-    std::array<bool, 5> key;
+    std::array<bool, 8> key;
+    mouse_cursor_pos cursor_pos;
 };

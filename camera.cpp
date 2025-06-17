@@ -2,6 +2,10 @@
 #include "camera.h"
 #include "config.h"
 #include "input.h"
+#include "key.h"
+
+#include <cmath>
+#include <cstdio>
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -17,7 +21,6 @@ Camera::Camera(
         const glm::vec3& position,
         const glm::vec3& look_at,
         const glm::vec3& up,
-        float fov,
         float width,
         float height,
         float near_plane,
@@ -37,7 +40,7 @@ Camera::Camera(
 	);
 
     projection = glm::perspective(
-		glm::radians(config::FOV),
+		glm::radians(camera_fov),
 		config::ASPECT_RATIO, // width / height 
 		near_plane,
 		far_plane
@@ -63,16 +66,25 @@ void Camera::translate(const glm::vec3& v) {
 	glm::vec3 world_up = glm::vec3(0.0, 1.0, 0.0);
 	glm::vec3 cam_right = glm::normalize(glm::cross(world_up, look_at));
 	glm::vec cam_up = glm::cross(look_at, cam_right);
-
+	
+	//glm::mat4 res = glm::rotate(look_at, yaw, glm::vec3(0.0, 1.0, 0.0));
+	
 	view = glm::lookAt(camera_position, look_at, cam_up);
-
-	//view = glm::rotate(view, 180.0, glm::vec3(0.0, 1.0, 0.0));
 }
 
 void Camera::rotate(const float yaw, const float pitch) {
 
-	view *= glm::rotate(yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-	view *= glm::rotate(pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::vec3 direction(
+		std::cos(pitch) * std::sin(yaw),
+		std::sin(pitch),
+		std::cos(pitch) * std::cos(yaw)
+	);
+
+	glm::vec3 world_up = glm::vec3(0.0, 1.0, 0.0);
+	glm::vec3 cam_right = glm::normalize(glm::cross(world_up, look_at));
+	glm::vec cam_up = glm::cross(look_at, cam_right);
+
+	view = glm::lookAt(camera_position, camera_position + direction, cam_up);
 
 }
 
@@ -84,7 +96,7 @@ glm::mat4 Camera::get_view() const {
 	return view;
 }
 
-void Camera::update() {
+void Camera::update(double delta) {
 	if (input->key[static_cast<int>(Key::KeyPress::W)]) {
 		//camera.translate(glm::vec3(5,0,5));
 		translate(glm::vec3(0, 0, -0.1));
@@ -101,27 +113,33 @@ void Camera::update() {
 		//camera.translate(glm::vec3(-5,0,15));
 		translate(glm::vec3(0.1, 0, 0));
 	}
-	// if (in.key[static_cast<int>(Key::KeyPress::RIGHT)]) {
-	// 	//camera.translate(glm::vec3(-5,0,15));
-	// 	yaw += 0.01;
-	// 	rotate(yaw, pitch);
-	// }
-	// if (in.key[static_cast<int>(Key::KeyPress::LEFT)]) {
-	// 	yaw -= 0.01;
-	// 	rotate(yaw, pitch);
-	// }
-	// if (in.key[static_cast<int>(Key::KeyPress::UP)]) {
-	// 	pitch += 0.01f;
-	// 	rotate(yaw, pitch);
-	// }
-	// if (in.key[static_cast<int>(Key::KeyPress::DOWN)]) {
-	// 	pitch -= 0.01f;
-	// 	rotate(yaw, pitch);
-	// }
+	if (input->key[static_cast<int>(Key::KeyPress::RIGHT)]) {
+		//camera.translate(glm::vec3(-5,0,15));
+		//yaw += 0.001;
+		yaw += 0.001f;
+		rotate(yaw, pitch);
+	}
+	if (input->key[static_cast<int>(Key::KeyPress::LEFT)]) {
+		yaw -= 0.0001;
+		rotate(yaw, pitch);
+	}
+	if (input->key[static_cast<int>(Key::KeyPress::UP)]) {
+		pitch += 0.01f;
+		rotate(yaw, pitch);
+	}
+	if (input->key[static_cast<int>(Key::KeyPress::DOWN)]) {
+		pitch -= 0.01f;
+		rotate(yaw, pitch);
+	}
+
+	int xpos, ypos;
+	//glfwGetCursorPos(&xpos, &ypos);
+	//glfwSetMousePos(config::SCREEN_W / 2, config::SCREEN_H / 2);
+	mouse_cursor_pos mouse_pos = input->get_cursor_pos();
+
+	printf("x: %f y: %f\n", mouse_pos.xpos, mouse_pos.ypos);
 
 
-
-	
 	if (yaw >= 360) yaw = 0.0f;
 	if (pitch >= 360) pitch = 0.0f;
 	if (yaw < 0) yaw = 360.0f;
