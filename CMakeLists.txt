@@ -28,6 +28,7 @@ add_executable(a
     material.cpp
     renderable_mesh.cpp
     mesh_cube.cpp
+    mesh_line.cpp
     mesh_quad.cpp
     mesh_triangle.cpp
     shader.cpp
