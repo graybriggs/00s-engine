@@ -5,13 +5,13 @@
 RMeshLine::RMeshLine() {
 
     static const float line_geometry[] = {
-        -1.0f, 0.0f, 0.0f,
+         0.0f, 0.0f, 0.0f,
          1.0f, 0.0f, 0.0f
     };
 
-    static const float line_colors[] = {
-        1.0f, 1.0f, 1.0f,  // white
-        1.0f, 1.0f, 1.0f // white
+    static const GLfloat line_colors[] = {
+        1.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 1.0f 
     };
 
     std::vector<GLuint> idx = {
@@ -24,11 +24,10 @@ RMeshLine::RMeshLine() {
 
     // geometry
 
-    glGenBuffers(1,&vbo);
+    glGenBuffers(1, &vbo); // create
+    // setup
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(line_geometry), line_geometry, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(
         0,
         3,
@@ -37,15 +36,14 @@ RMeshLine::RMeshLine() {
         0,
         (void*)0  
     );
+    glEnableVertexAttribArray(0); // enable
 
     // color info
 
-    glGenBuffers(1,&vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
+    glGenBuffers(1, &vbo_col);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_col);
     glBufferData(GL_ARRAY_BUFFER, sizeof(line_colors), line_colors, GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(1);
     glVertexAttribPointer(
         1,
         3,
@@ -54,6 +52,7 @@ RMeshLine::RMeshLine() {
         0,
         (void*)0  
     );
+    glEnableVertexAttribArray(1);
 
     // indices
 
@@ -70,15 +69,15 @@ GLuint RMeshLine::get_index_count() const {
 
 void RMeshLine::bind() const {
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 }
 
 void RMeshLine::unbind() const {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void RMeshLine::cleanup() const {
-
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
