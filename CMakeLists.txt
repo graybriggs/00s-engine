@@ -20,7 +20,6 @@ find_package(glfw3 3.3 REQUIRED)
 add_executable(a
     camera.cpp
     controls.cpp
-    cube.cpp
     device.cpp
     entity.cpp
     input.cpp
@@ -29,8 +28,10 @@ add_executable(a
     renderable_mesh.cpp
     mesh_cube.cpp
     mesh_line.cpp
+    mesh_model.cpp
     mesh_quad.cpp
     mesh_triangle.cpp
+    model_loader.cpp
     shader.cpp
     shape_generator.cpp
     stb_image.cpp
