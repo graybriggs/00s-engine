@@ -19,7 +19,7 @@ void VideoDriver::setup() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
 }
 
@@ -42,7 +42,9 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 		GLuint handle = ent->get_material().handle();
 		GLuint idx_count = ent->get_mesh()->get_index_count();
 
-		glUseProgram(ent->get_material().handle());
+		//std::cout << "HANDLE: " << handle << "\n";
+		glUseProgram(handle);
+
 		GLuint shader_id_model = glGetUniformLocation(handle, "model");
 		glUniformMatrix4fv(shader_id_model, 1, GL_FALSE, glm::value_ptr(model_matrix));
 		GLuint shader_id_view = glGetUniformLocation(handle, "view");
@@ -50,9 +52,52 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 		GLuint shader_id_projection = glGetUniformLocation(handle, "projection");
 		glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, glm::value_ptr(camera.get_projection()));
 
+
+		GLuint texture_sampler;
+		auto texture_id = ent->get_texture();
 		ent->get_mesh()->bind();
-		glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
-		//glDrawArrays(GL_TRIANGLES, 0, idx_count); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		
+		EntityType ent_type = ent->get_type();
+		if (ent_type == EntityType::TEXTURED_MODEL) {
+			glBindTexture(GL_TEXTURE_2D, texture_id);
+			if (texture_id == 1) {
+				texture_sampler = glGetUniformLocation(handle, "tex_sampler0");
+				glActiveTexture(GL_TEXTURE0);
+			}
+			else {
+				texture_sampler = glGetUniformLocation(handle, "tex_sampler1");
+				glActiveTexture(GL_TEXTURE1);
+			}
+			//glActiveTexture(GL_TEXTURE0 + texture_id);
+			glUniform1i(texture_sampler, GL_TEXTURE0 + texture_id);
+			//ent->get_mesh()->bind();
+			glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
+		}
+		else if (ent_type == EntityType::UNTEXTURED_MODEL) {
+			glm::vec3 light_pos(0.0f, 0.0f, -10.0f);
+			GLuint shader_light_pos = glGetUniformLocation(handle, "light_pos");
+			glUniform3fv(shader_light_pos, 1, glm::value_ptr(light_pos));
+
+			//glUniform3f(handle, 0.0f, 1.0f, 0.0f);
+			
+			//glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
+			glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
+		}
+		else if (ent_type == EntityType::LIGHT) {
+			// get light's position and work with that
+			// glm::vec3 light_pos(0.0f, 0.0f, 10.0f);
+			// GLuint shader_light_pos = glGetUniformLocation(handle, "light_pos");
+			// glUniform3fv(handle, 1, glm::value_ptr(light_pos));
+		}
+		else if (ent_type == EntityType::LINE) {
+			glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
+		}
+		
+		//ent->get_mesh()->bind();
+		//glUniform3f(handle, 0.0f, 1.0f, 0.0f);
+		//std::cout << "idx count: " << idx_count << "\n";
+		
 		ent->get_mesh()->unbind();
+		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
