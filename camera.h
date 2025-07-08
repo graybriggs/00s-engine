@@ -47,9 +47,10 @@ private:
     float cam_yaw{};
     float cam_pitch{};
     glm::vec3 camera_speed;
+    const float camera_velocity = 0.7f;
     float camera_fov = 45.0f; // ? 100.0f;
     float mouse_speed = 0.005f;
-
+    
 
     glm::mat4 projection;
     glm::mat4 view;

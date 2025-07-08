@@ -66,7 +66,7 @@ glm::vec3 Camera::calculate_direction() {
 
 	return glm::normalize(
 		glm::vec3(
-			glm::sin(y) * glm::cos(y),
+			glm::cos(p) * glm::sin(y),
 			glm::sin(p),
 			glm::cos(p) * glm::cos(y)
 		)
@@ -76,20 +76,24 @@ glm::vec3 Camera::calculate_direction() {
 glm::vec3 Camera::calculate_forward() {
 	float z = sin(cam_yaw);
 	float x = cos(cam_yaw); 
-	return glm::vec3(x, 0, z);
+	//return glm::vec3(x, 0, z);
+	return calculate_direction();
 }
 
 
 void Camera::update_yaw(float yaw) {
 	cam_yaw += yaw;
-	camera_direction = calculate_direction();
-	view = glm::lookAt(camera_position, camera_position + camera_direction, get_world_up());
+	//camera_direction = calculate_direction();
+	camera_direction = glm::normalize(calculate_forward());
+	view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 }
 
 void Camera::update_pitch(float pitch) {
+	//cam_pitch += pitch;
 	cam_pitch += pitch;
-	camera_direction = calculate_direction();
-	view = glm::lookAt(camera_position, camera_position + camera_direction, get_world_up());
+	//camera_direction = calculate_direction();
+	camera_direction = glm::normalize(calculate_forward());
+	view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 }
 
 glm::vec3 Camera::get_world_up() {
@@ -117,7 +121,7 @@ void Camera::translate(const glm::vec3& vec) {
 	camera_right = glm::normalize(glm::cross(camera_direction, WORLD_UP));
 	camera_up = glm::normalize(glm::cross(camera_right, camera_direction));
 	
-		view = glm::lookAt(camera_position, camera_position + camera_direction, camera_up);
+	view = glm::lookAt(camera_position, camera_position + camera_direction, camera_up);
 }
 
 glm::mat4 Camera::get_projection() const {
@@ -130,9 +134,8 @@ glm::mat4 Camera::get_view() const {
 
 void Camera::update(double delta) {
 	
-	print_camera_position();
+	//print_camera_position();
 
-	const float velocity = 0.5f;
 
 	if (input->key[static_cast<int>(Key::KeyPress::W)]) {
 		//glm::vec3 movement_velocity(0.0f, 0.0f, 1.0f);
@@ -140,9 +143,8 @@ void Camera::update(double delta) {
 
 		//camera_direction -= glm::vec3(0,0,1) * velocity;
 		
-		camera_position += calculate_forward() * velocity;
+		camera_position += calculate_forward() * camera_velocity;
 		camera_direction = glm::normalize(calculate_forward());
-
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
@@ -150,17 +152,17 @@ void Camera::update(double delta) {
 		
 		//camera_position += glm::vec3(0,0,1) * velocity;
 		
-		camera_position -= calculate_forward() * velocity;
+		camera_position -= calculate_forward() * camera_velocity;
 		camera_direction = glm::normalize(calculate_forward());
-
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}		
 	if (input->key[static_cast<int>(Key::KeyPress::A)]) {
 
+		camera_direction = glm::normalize(calculate_forward()); // temp: this stops nan bug
+
 		glm::vec3 right = glm::normalize(glm::cross(camera_direction, glm::vec3(0,1,0)));
-		camera_position -= right * velocity;
-		
+		camera_position -= right * camera_velocity;
 
 		camera_direction = glm::normalize(calculate_forward());
 
@@ -168,33 +170,42 @@ void Camera::update(double delta) {
 	}
 	if (input->key[static_cast<int>(Key::KeyPress::D)]) {
 
+		camera_direction = glm::normalize(calculate_forward()); // temp: this stops nan bug
+
 		glm::vec3 right = glm::normalize(glm::cross(camera_direction, glm::vec3(0,1,0)));
-		camera_position += right * velocity;
+		camera_position += right * camera_velocity;
 
 		camera_direction = glm::normalize(calculate_forward());
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
 	if (input->key[static_cast<int>(Key::KeyPress::RIGHT)]) {
-		cam_yaw += 0.01f;
+		cam_yaw -= 0.03f;
 		
 		camera_direction = glm::normalize(calculate_forward());
-
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
 	if (input->key[static_cast<int>(Key::KeyPress::LEFT)]) {
-		cam_yaw -= 0.01f;
+		cam_yaw += 0.03f;
 
 		camera_direction = glm::normalize(calculate_forward());
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
-	// if (input->key[static_cast<int>(Key::KeyPress::UP)]) {
-	// 	update_pitch(-0.2);
-	// }
-	// if (input->key[static_cast<int>(Key::KeyPress::DOWN)]) {
-	// 	update_pitch(0.2);
-	// }
+	if (input->key[static_cast<int>(Key::KeyPress::UP)]) {
+		cam_pitch -= 0.01f;
+
+		camera_direction = glm::normalize(calculate_forward());
+
+		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
+	}
+	if (input->key[static_cast<int>(Key::KeyPress::DOWN)]) {
+		cam_pitch += 0.01f;
+
+		camera_direction = glm::normalize(calculate_forward());
+
+		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
+	}
 
 	// int xpos, ypos;
 	//glfwGetCursorPos(&xpos, &ypos);
