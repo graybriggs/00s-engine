@@ -17,27 +17,31 @@ add_definitions(${OpenGL_DEFINITIONS})
 
 find_package(glfw3 3.3 REQUIRED)
 
-add_executable(a
+add_subdirectory(mesh)
+
+set(SOURCES
     camera.cpp
-    controls.cpp
     device.cpp
     entity.cpp
     input.cpp
     main.cpp
     material.cpp
-    renderable_mesh.cpp
-    mesh_cube.cpp
-    mesh_line.cpp
-    mesh_model.cpp
-    mesh_quad.cpp
-    mesh_triangle.cpp
+    mesh/mesh_cube.cpp
+    mesh/mesh_line.cpp
+    mesh/mesh_model.cpp
+    mesh/mesh_quad.cpp
+    mesh/mesh_triangle.cpp
+    mesh/renderable_mesh.cpp
     model_loader.cpp
     shader.cpp
-    shape_generator.cpp
     stb_image.cpp
+    texture.cpp
     texture_loader.cpp
     timer.cpp
     video.cpp
 )
 
+add_executable(a ${SOURCES})
+
+target_include_directories(a PRIVATE mesh)
 target_link_libraries(a OpenGL::OpenGL GLEW::GLEW glfw)
