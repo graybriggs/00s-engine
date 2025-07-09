@@ -1,11 +1,10 @@
 #pragma once
 
-#include <glew.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GLFW/glfw3.h>
 
-#include <string>
 
 class Drawable {
 public:

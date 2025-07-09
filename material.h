@@ -11,8 +11,8 @@ public:
     //Material(Shader vertex_shader, Shader fragment_shader);
     Material(GLuint vertex_shader, GLuint fragment_shader);
 
-    Material(const Material&) = delete;
-    Material& operator=(const Material&) = delete;
+    //Material(const Material&) = delete;
+    //Material& operator=(const Material&) = delete;
 
     GLuint handle();
 

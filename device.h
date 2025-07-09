@@ -37,4 +37,5 @@ private:
 
 std::unique_ptr<Device> makeDevice(int screen_w, int screen_h);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void mouse_callback(GLFWwindow* window, double  xpos, double ypos);
+static void cursor_position_callback(GLFWwindow* window, double  xpos, double ypos);
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);

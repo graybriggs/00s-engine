@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renderable_mesh.h"
+#include "./mesh/renderable_mesh.h"
 #include "material.h"
 
 #include <glm/glm.hpp>
@@ -23,11 +23,13 @@ public:
 
 	const RMesh* get_mesh() const;
 	Material get_material() const;
+	void set_material(Material mat);
 	glm::mat4 get_model_matrix() const;
 	void set_model_matrix(glm::mat4 mm);
 	void set_texture(GLuint tex);
 	GLuint get_texture() const;
 	EntityType get_type() const;
+	void set_viewable_flag(const bool b);
 
 private:
 	const RMesh* mesh;
@@ -41,5 +43,7 @@ private:
 	
 	// Texture texture;??
 	// Sampler sampler;??
+
+	bool viewable;
 
 };

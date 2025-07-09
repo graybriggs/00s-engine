@@ -19,7 +19,7 @@ public:
     void set_left_mouse_release();
     bool get_left_mouse_button_state();
 //private:
-    std::array<bool, 8> key;
+    std::array<bool, 8> key{};
     mouse_cursor_pos cursor_pos;
     bool left_mouse_click;
 };

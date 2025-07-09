@@ -1,8 +1,4 @@
 #pragma once
-#pragma once
-
-#ifndef SHADER_H
-#define SHADER_H
 
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -10,11 +6,6 @@
 enum class ShaderType { VERTEX, FRAGMENT };
 
 GLuint load_shaders(const char * vertex_file_path, const char * fragment_file_path);
-
-// GLuint vertex_shader(const char* vs_path);
-// GLuint fragment_shader(const char* fs_path);
-
-// GLuint load_compile_shader(const char* path);
 
 
 class Shader {
@@ -28,4 +19,3 @@ private:
     GLuint shader_id;
 };
 
-#endif

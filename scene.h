@@ -7,4 +7,4 @@
 struct Scene {
     // expand to have filtering; ordering
     std::vector<Entity*> entities;
-}
+};
