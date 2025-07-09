@@ -33,6 +33,7 @@ set(SOURCES
     mesh/mesh_triangle.cpp
     mesh/renderable_mesh.cpp
     model_loader.cpp
+    scene.cpp
     shader.cpp
     stb_image.cpp
     texture.cpp
