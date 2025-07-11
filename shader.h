@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-enum class ShaderType { VERTEX, FRAGMENT };
+enum class ShaderType { VERTEX, GEOMETRY, FRAGMENT };
 
 GLuint load_shaders(const char * vertex_file_path, const char * fragment_file_path);
 

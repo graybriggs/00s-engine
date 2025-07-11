@@ -1,8 +1,9 @@
 
 #include "shader.h"
 
-#include <sstream>
+#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 #include <GL/glew.h>
@@ -104,79 +105,6 @@ GLuint load_shaders(const char* vertex_file_path, const char* fragment_file_path
 	return program_id;
 }
 
-// GLuint vertex_shader(const char* vs_path) {
-
-// 	GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-
-// 	// Read the Vertex Shader code from the file
-// 	std::string VertexShaderCode;
-// 	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-// 	if (VertexShaderStream.is_open()) {
-// 		std::stringstream sstr;
-// 		sstr << VertexShaderStream.rdbuf();
-// 		VertexShaderCode = sstr.str();
-// 		VertexShaderStream.close();
-// 	}
-// 	else {
-// 		printf("Cannot open %s\n", vertex_file_path);
-// 		getchar();
-// 		return 0;
-// 	}
-
-// 		// Compile Vertex Shader
-// 	printf("Compiling shader : %s\n", vertex_file_path);
-// 	char const * VertexSourcePointer = VertexShaderCode.c_str();
-// 	glShaderSource(vertex_shader_id, 1, &VertexSourcePointer, NULL);
-// 	glCompileShader(vertex_shader_id);
-
-// 	// Check Vertex Shader
-// 	glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &result);
-// 	glGetShaderiv(vertex_shader_id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-// 	if (InfoLogLength > 0) {
-// 		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-// 		glGetShaderInfoLog(vertex_shader_id, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-// 		printf("%s\n", &VertexShaderErrorMessage[0]);
-// 	}
-// }
-
-// GLuint fragment_shader(const char* fs_path) {
-
-// 	GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-
-// 		// Read the Fragment Shader code from the file
-// 	std::string FragmentShaderCode;
-// 	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-// 	if (FragmentShaderStream.is_open()) {
-// 		std::stringstream sstr;
-// 		sstr << FragmentShaderStream.rdbuf();
-// 		FragmentShaderCode = sstr.str();
-// 		FragmentShaderStream.close();
-// 	}
-// 	else {
-// 		printf("Cannot open %s\n", fragment_file_path);
-// 		getchar();
-// 		return 0;
-// 	}
-
-// 	printf("Compiling shader : %s\n", fragment_file_path);
-// 	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
-// 	glShaderSource(fragment_shader_id, 1, &FragmentSourcePointer, NULL);
-// 	glCompileShader(fragment_shader_id);
-
-// 	// Check Fragment Shader
-// 	glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &result);
-// 	glGetShaderiv(fragment_shader_id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-// 	if (InfoLogLength > 0) {
-// 		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-// 		glGetShaderInfoLog(fragment_shader_id, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-// 		printf("%s\n", &FragmentShaderErrorMessage[0]);
-// 	}
-// }
-
-// GLuint load_compile_shader(const char* path) {
-
-
-// }
 
 Shader::Shader(const char* path, const ShaderType type) {
 
@@ -184,6 +112,9 @@ Shader::Shader(const char* path, const ShaderType type) {
 
 	if (type == ShaderType::VERTEX) {
 		shader_id = glCreateShader(GL_VERTEX_SHADER);
+	}
+	else if (type == ShaderType::GEOMETRY) {
+		shader_id = glCreateShader(GL_GEOMETRY_SHADER);
 	}
 	else if (type == ShaderType::FRAGMENT) {
 		shader_id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -206,8 +137,8 @@ Shader::Shader(const char* path, const ShaderType type) {
 	}
 
 	printf("Compiling shader : %s\n", path);
-	char const * source_ptr = shader_code.c_str();
-	glShaderSource(shader_id, 1, &source_ptr, NULL);
+	char const* source_ptr = shader_code.c_str();
+	glShaderSource(shader_id, 1, &source_ptr, nullptr);
 	glCompileShader(shader_id);
 
 	// post compile check
@@ -219,9 +150,11 @@ Shader::Shader(const char* path, const ShaderType type) {
 	glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &log_length);
 	if (log_length > 0) {
 		std::vector<char> error_message(log_length + 1);
-		glGetShaderInfoLog(shader_id, log_length, NULL, &error_message[0]);
-		printf("%s\n", &error_message[0]);
+		glGetShaderInfoLog(shader_id, log_length, nullptr, &error_message[0]);
+		printf("ShaderInfoLog: %s\n", &error_message[0]);
 	}
+
+	std::cout << "Shader_id: " << shader_id << "\n";
 }
 
 GLuint Shader::handle() const {
