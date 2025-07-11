@@ -10,6 +10,7 @@ GLuint load_shaders(const char * vertex_file_path, const char * fragment_file_pa
 
 class Shader {
 public:
+    Shader() = default;
     Shader(const char* path, const ShaderType type);
     GLuint handle() const;
 

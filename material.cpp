@@ -10,12 +10,17 @@
 #include "material.h"
 
 //Material::Material(GLuint vertex_shader_id, GLuint fragment_shader_id) {
-Material::Material(GLuint vertex_shader_id, GLuint fragment_shader_id) {
+Material::Material(GLuint vertex_shader_id, GLuint fragment_shader_id, GLuint geometry_shader_id) {
 
 	printf("Linking material program\n");
 	program_id = glCreateProgram();
 	glAttachShader(program_id, vertex_shader_id);
 	glAttachShader(program_id, fragment_shader_id);
+
+	if (geometry_shader_id > 0) {
+		glAttachShader(program_id, geometry_shader_id);
+	}
+
     glLinkProgram(program_id);
     
 	GLint result = GL_FALSE;
@@ -26,14 +31,22 @@ Material::Material(GLuint vertex_shader_id, GLuint fragment_shader_id) {
 	if (info_log_length > 0) {
 		std::vector<char> err_msg(info_log_length + 1);
 		glGetProgramInfoLog(program_id, info_log_length, NULL, &err_msg[0]);
-		printf("%s\n", &err_msg[0]);
+		printf("Shader info log: %s\n", &err_msg[0]);
 	}
 
     glDetachShader(program_id, vertex_shader_id);
 	glDetachShader(program_id, fragment_shader_id);
 
+	if (geometry_shader_id > 0) {
+		glDetachShader(program_id, geometry_shader_id);
+	}
+
 	glDeleteShader(vertex_shader_id);
 	glDeleteShader(fragment_shader_id);
+
+	if (geometry_shader_id > 0) {
+		glDeleteShader(geometry_shader_id);
+	}
 }
 
 GLuint Material::handle() {

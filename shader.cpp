@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <vector>
 
 #include <GL/glew.h>
@@ -108,18 +109,6 @@ GLuint load_shaders(const char* vertex_file_path, const char* fragment_file_path
 
 Shader::Shader(const char* path, const ShaderType type) {
 
-	shader_type = type;
-
-	if (type == ShaderType::VERTEX) {
-		shader_id = glCreateShader(GL_VERTEX_SHADER);
-	}
-	else if (type == ShaderType::GEOMETRY) {
-		shader_id = glCreateShader(GL_GEOMETRY_SHADER);
-	}
-	else if (type == ShaderType::FRAGMENT) {
-		shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-	}
-
 	// read from file
 	std::string shader_code;
 	std::ifstream shader_stream(path, std::ios::in);
@@ -133,7 +122,19 @@ Shader::Shader(const char* path, const ShaderType type) {
 		printf("Cannot open %s\n", path);
 		getchar();
 		//return 0;
-		//throw?
+		throw std::runtime_error("Cannot open: " + std::string(path));
+	}
+
+	shader_type = type;
+
+	if (type == ShaderType::VERTEX) {
+		shader_id = glCreateShader(GL_VERTEX_SHADER);
+	}
+	else if (type == ShaderType::GEOMETRY) {
+		shader_id = glCreateShader(GL_GEOMETRY_SHADER);
+	}
+	else if (type == ShaderType::FRAGMENT) {
+		shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 	}
 
 	printf("Compiling shader : %s\n", path);
