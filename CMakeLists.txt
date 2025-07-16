@@ -24,6 +24,7 @@ set(SOURCES
     device.cpp
     entity.cpp
     input.cpp
+    light.cpp
     main.cpp
     material.cpp
     mesh/mesh_cube.cpp
@@ -33,6 +34,7 @@ set(SOURCES
     mesh/mesh_triangle.cpp
     mesh/renderable_mesh.cpp
     model_loader.cpp
+    ray.cpp
     scene.cpp
     shader.cpp
     stb_image.cpp
