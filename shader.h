@@ -20,3 +20,30 @@ private:
     GLuint shader_id;
 };
 
+
+#include <string>
+
+class Shader_ {
+public:
+    Shader_() = default;
+    Shader_(const char* vs_path, const char* fs_path);
+    Shader_(const char* vs_path, const char* fs_path, const char* gs_path);
+
+private:
+
+    std::string load_shader(std::string path);
+    void compile_shader(ShaderType type);
+    void post_compile_check();
+    void link_shader();
+    void cleanup_shader();
+
+private:
+
+    std::string shader_code;
+    std::string shader_from_path;
+
+    GLuint vertex_id;
+    GLuint fragment_id;
+    GLuint geometry_id;
+    GLuint program_id;
+};
