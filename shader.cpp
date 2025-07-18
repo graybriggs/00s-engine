@@ -167,8 +167,12 @@ GLuint Shader::handle() const {
 
 // NEW
 
-#include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp> 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
+#include <iostream>
 
 
 Shader_::Shader_(const char* vs_path, const char* fs_path):
@@ -194,11 +198,31 @@ Shader_::Shader_(const char* vs_path, const char* fs_path, const char* gs_path) 
 		cleanup_shader();
 }
 
+void Shader_::use_program() {
+	glUseProgram(program_id);
+}
+
 GLuint Shader_::get_program() const {
 	return program_id;
 }
 
+void Shader_::set_uniform(std::string id, glm::vec3 v3) {
+	GLuint uniform_location = glGetUniformLocation(program_id, id.c_str());
+	glUniform3fv(uniform_location, 1, glm::value_ptr(v3));
+}
+
+void Shader_::set_uniform(std::string id, glm::mat4 m4) {
+	GLuint uniform_location = glGetUniformLocation(program_id, id.c_str());
+	glUniformMatrix4fv(uniform_location, 1, GL_FALSE, glm::value_ptr(m4));
+}
+
+void Shader_::set_texture(std::string name, GLuint texture_id, GLenum texture_unit) {
+
+}
+
+////
 // private methods
+///
 
 std::string Shader_::load_shader(const std::string path) {
 	// read from file

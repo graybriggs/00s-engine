@@ -3,7 +3,11 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-enum class ShaderType { VERTEX, GEOMETRY, FRAGMENT };
+enum class ShaderType {
+    VERTEX,
+    GEOMETRY,
+    FRAGMENT
+};
 
 GLuint load_shaders(const char * vertex_file_path, const char * fragment_file_path);
 
@@ -22,6 +26,8 @@ private:
 
 
 #include <string>
+#include <glm/glm.hpp>
+
 
 class Shader_ {
 public:
@@ -29,10 +35,14 @@ public:
     Shader_(const char* vs_path, const char* fs_path);
     Shader_(const char* vs_path, const char* fs_path, const char* gs_path);
 
+    void use_program();
+    void set_uniform(std::string id, glm::vec3 v);
+    void set_uniform(std::string id, glm::mat4 m4);
+
+    void set_texture(std::string name, GLuint texture_id, GLenum texture_unit);
     GLuint get_program() const;
 
 private:
-
     std::string load_shader(const std::string path);
     void compile_shader(const std::string& shader_code, ShaderType type);
     void post_compile_check(GLuint shader_type);
