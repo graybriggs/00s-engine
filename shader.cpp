@@ -171,33 +171,38 @@ GLuint Shader::handle() const {
 
 
 
-Shader_::Shader_(const char* vs_path, const char* fs_path) {
+Shader_::Shader_(const char* vs_path, const char* fs_path):
+	geometry_id(-1) {
 
-		load_shader(vs_path);
-		compile_shader(ShaderType::VERTEX);
-		load_shader(fs_path);
-		compile_shader(ShaderType::FRAGMENT);
-		post_compile_check();
+		auto vsc = load_shader(vs_path);
+		compile_shader(vsc, ShaderType::VERTEX);
+		auto fsc = load_shader(fs_path);
+		compile_shader(fsc, ShaderType::FRAGMENT);
 		link_shader();
 		cleanup_shader();
 }
 
 Shader_::Shader_(const char* vs_path, const char* fs_path, const char* gs_path) {
 
-		load_shader(vs_path);
-		compile_shader(ShaderType::VERTEX);
-		load_shader(fs_path);
-		compile_shader(ShaderType::FRAGMENT);
-		load_shader(gs_path);
-		compile_shader(ShaderType::GEOMETRY);
-		post_compile_check();
+		auto vsc = load_shader(vs_path);
+		compile_shader(vsc, ShaderType::VERTEX);
+		auto fsc = load_shader(fs_path);
+		compile_shader(fsc, ShaderType::FRAGMENT);
+		auto gsc = load_shader(gs_path);
+		compile_shader(gsc, ShaderType::GEOMETRY);
 		link_shader();
 		cleanup_shader();
 }
 
+GLuint Shader_::get_program() const {
+	return program_id;
+}
 
-std::string Shader_::load_shader(std::string path) {
+// private methods
+
+std::string Shader_::load_shader(const std::string path) {
 	// read from file
+	shader_from_path = path;
 	std::string shader_code;
 	std::ifstream shader_stream(path.c_str(), std::ios::in);
 	if (shader_stream.is_open()) {
@@ -205,46 +210,56 @@ std::string Shader_::load_shader(std::string path) {
 		sstr << shader_stream.rdbuf();
 		shader_code = sstr.str();
 		shader_stream.close();
+		return shader_code;
 	}
 	else {
-		printf("Cannot open %s\n", path);
+		std::cout << "Cannot open: " << path << "\n";
 		getchar();
 		//return 0;
 		throw std::runtime_error("Cannot open: " + std::string(path));
 	}
 }
 
-void Shader_::compile_shader(ShaderType type) {
+void Shader_::compile_shader(const std::string& shader_code, ShaderType type) {
 
+	std::cout << "Compiling shader: " << shader_from_path << "\n";
+	char const* source_ptr = shader_code.c_str();
+	
 	if (type == ShaderType::VERTEX) {
 		vertex_id = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertex_id, 1, &source_ptr, nullptr);
+		glCompileShader(vertex_id);
+		post_compile_check(vertex_id);
 	}
 	else if (type == ShaderType::GEOMETRY) {
 		geometry_id = glCreateShader(GL_GEOMETRY_SHADER);
+		glShaderSource(geometry_id, 1, &source_ptr, nullptr);
+		glCompileShader(geometry_id);
+		post_compile_check(geometry_id);
 	}
 	else if (type == ShaderType::FRAGMENT) {
 		fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragment_id, 1, &source_ptr, nullptr);
+		glCompileShader(fragment_id);
+		post_compile_check(fragment_id);
 	}
-
-	std::cout << "Compiling shader : %s\n" << shader_from_path << "\n";
-	char const* source_ptr = shader_code.c_str();
-	glShaderSource(program_id, 1, &source_ptr, nullptr);
-	glCompileShader(program_id);
+	
+	
 }
 
-void Shader_::post_compile_check() {
+void Shader_::post_compile_check(GLuint shader_type) {
 	GLint result = GL_FALSE;
 	int log_length;
 
-	glGetShaderiv(program_id, GL_COMPILE_STATUS, &result);
-	glGetShaderiv(program_id, GL_INFO_LOG_LENGTH, &log_length);
+	glGetShaderiv(shader_type, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(shader_type, GL_INFO_LOG_LENGTH, &log_length);
 	if (log_length > 0) {
 		std::vector<char> error_message(log_length + 1);
 		glGetShaderInfoLog(program_id, log_length, nullptr, &error_message[0]);
-		printf("ShaderInfoLog: %s\n", &error_message[0]);
+		std::cerr << "NS: ShaderInfoLog: " << error_message.data() << "\n";
 	}
 	else {
-		std::cout << "Shader: " << program_id << " compiled OK\n";
+		std::cout << "Shader: " << shader_type << " compiled OK\n";
 	}
 }
 
@@ -270,7 +285,7 @@ void Shader_::link_shader() {
 	if (info_log_length > 0) {
 		std::vector<char> err_msg(info_log_length + 1);
 		glGetProgramInfoLog(program_id, info_log_length, NULL, &err_msg[0]);
-		printf("Shader info log: %s\n", &err_msg[0]);
+		printf("NS: Shader info log: %s\n", &err_msg[0]);
 	}
 	else {
 		std::cout << "Shader: " << program_id << " linked OK\n";

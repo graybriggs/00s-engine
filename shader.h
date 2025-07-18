@@ -29,17 +29,17 @@ public:
     Shader_(const char* vs_path, const char* fs_path);
     Shader_(const char* vs_path, const char* fs_path, const char* gs_path);
 
+    GLuint get_program() const;
+
 private:
 
-    std::string load_shader(std::string path);
-    void compile_shader(ShaderType type);
-    void post_compile_check();
+    std::string load_shader(const std::string path);
+    void compile_shader(const std::string& shader_code, ShaderType type);
+    void post_compile_check(GLuint shader_type);
     void link_shader();
     void cleanup_shader();
 
 private:
-
-    std::string shader_code;
     std::string shader_from_path;
 
     GLuint vertex_id;
