@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 
-glm::vec4 make_ray(mouse_cursor_pos mcp, glm::mat4 projection, glm::mat4 view) {
+glm::vec4 cast_ray(mouse_cursor_pos mcp, glm::mat4 projection, glm::mat4 view) {
 
     // convert screen coords to NDC
 
@@ -19,7 +19,7 @@ glm::vec4 make_ray(mouse_cursor_pos mcp, glm::mat4 projection, glm::mat4 view) {
 
     // convert to view space
     glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
-    ray_eye.z = -1.0f;
+    ray_eye.z = -1.0f; // forward - OpenGL
     ray_eye.w = 0.0f;
 
     // convert to world space
