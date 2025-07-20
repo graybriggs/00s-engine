@@ -1,7 +1,11 @@
 #pragma once
 
+#include <string>
+
 #include <GL/glew.h>
 #include <GL/gl.h>
+
+#include <glm/glm.hpp>
 
 enum class ShaderType {
     VERTEX,
@@ -11,35 +15,19 @@ enum class ShaderType {
 
 GLuint load_shaders(const char * vertex_file_path, const char * fragment_file_path);
 
+class Texture;
 
 class Shader {
 public:
     Shader() = default;
-    Shader(const char* path, const ShaderType type);
-    GLuint handle() const;
-
-private:
-    // could be various compiled shader types stored in a vector? that can be selected
-    ShaderType shader_type;
-    GLuint shader_id;
-};
-
-
-#include <string>
-#include <glm/glm.hpp>
-
-
-class Shader_ {
-public:
-    Shader_() = default;
-    Shader_(const char* vs_path, const char* fs_path);
-    Shader_(const char* vs_path, const char* fs_path, const char* gs_path);
+    Shader(const char* vs_path, const char* fs_path);
+    Shader(const char* vs_path, const char* fs_path, const char* gs_path);
 
     void use_program();
     void set_uniform(std::string id, glm::vec3 v);
     void set_uniform(std::string id, glm::mat4 m4);
 
-    void set_texture(std::string name, GLuint texture_id, GLenum texture_unit);
+    void set_texture(std::string name, Texture texture, GLenum texture_unit);
     GLuint get_program() const;
 
 private:
