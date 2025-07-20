@@ -20,6 +20,7 @@
 #include "entity.h"
 #include "input.h"
 #include "key.h"
+#include "light.h"
 #include "material.h"
 #include "./mesh/renderable_mesh.h"
 #include "./mesh/mesh_cube.h"
@@ -29,6 +30,7 @@
 #include "./mesh/mesh_quad.h"
 #include "./mesh/mesh_triangle.h"
 #include "model_loader.h"
+#include "ray.h"
 #include "scene.h"
 #include "shader.h"
 #include "texture.h"
@@ -49,17 +51,15 @@ int main() {
 	video->setup();
 
 	/////////////////////////////
+	 Shader color_shader("./shaders/vs_color.vert", "./shaders/fs_color.frag");
+	 Shader diffuse_shader("./shaders/vs_color.vert", "./shaders/fs_color.frag");
+	 Shader texture_shader("./shaders/vs_texture.vert", "./shaders/fs_texture.frag");
 
-	const auto vs_tex = Shader("./shaders/vs_texture.vert", ShaderType::VERTEX);
-	const auto fs_tex = Shader("./shaders/fs_texture.frag", ShaderType::FRAGMENT);
-	const auto vs_col = Shader("./shaders/vs_color.vert", ShaderType::VERTEX);
-	const auto fs_col = Shader("./shaders/fs_color.frag", ShaderType::FRAGMENT);
-	const auto vs_diffuse = Shader("./shaders/vs_diffuse.vert", ShaderType::VERTEX);
-	const auto fs_diffuse = Shader("./shaders/fs_diffuse.frag", ShaderType::FRAGMENT);
+	 Material new_material;
+	 new_material.add_shader("color", &color_shader);
+	 new_material.add_shader("diffuse", &diffuse_shader);
+	 new_material.add_shader("texture", &texture_shader);
 
-	const auto texture_material = Material(vs_tex.handle(), fs_tex.handle());
-	const auto color_material = Material(vs_col.handle(), fs_col.handle());
-	const auto diffuse_material = Material(vs_diffuse.handle(), fs_diffuse.handle());
 	const auto tri_mesh = std::make_unique<RMeshTriangle>();
 	const auto quad_mesh = std::make_unique<RMeshQuad>();
 	const auto cube_mesh = std::make_unique<RMeshCube>();
@@ -69,94 +69,124 @@ int main() {
 	Texture box_tex(tm.load_texture("thing", "./img/thing.jpg"));
 	Texture wall_tex(tm.load_texture("wall", "./img/wall.jpg"));
 
-	//std::cout << "IDs: " << box_tex << ", " << wall_tex << "\n";
-
-
-	Entity e1(tri_mesh.get(), texture_material, box_tex, EntityType::TEXTURED_MODEL);
-	e1.translate(glm::vec3(-5.0, 0.0, -6.0));
+	Entity e1(cube_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
 	e1.scale(glm::vec3(3,3,3));
+	e1.translate(glm::vec3(0.0, 2.0, -6.0));
 	
-	Entity e2(tri_mesh.get(), texture_material, box_tex, EntityType::TEXTURED_MODEL);
-	e2.translate(glm::vec3(6.0, 2.0, 4.0));
+	Entity e2(tri_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
 	e2.scale(glm::vec3(4,4,4));
+	e2.translate(glm::vec3(6.0, 2.0, 4.0));
 
-	Entity e3(tri_mesh.get(), texture_material, box_tex, EntityType::TEXTURED_MODEL);
+	Entity e3(quad_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
 	e3.scale(glm::vec3(5,5,5));
 	e3.translate(glm::vec3(4.0, 4.0, 3.0));
 	
-	Entity e4(tri_mesh.get(), texture_material, box_tex, EntityType::TEXTURED_MODEL);
-	e4.translate(glm::vec3(-2.0, 4.0, -2.0));
-	Entity e5(tri_mesh.get(), texture_material, box_tex, EntityType::TEXTURED_MODEL);
+	Entity e4(tri_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
+	//e4.scale(glm::vec3(3.0, 3.0, 3.0));
+	e4.rotate(glm::radians(-45.0f), glm::vec3(0.0, 1.0, 0.0));
+	e4.translate(glm::vec3(4.0, 4.0, -2.0));
+
+	Entity e5(quad_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
 	e5.translate(glm::vec3(4.0, 4.0, -4.0));
 	
-	Entity e6(tri_mesh.get(), texture_material, wall_tex, EntityType::TEXTURED_MODEL);
+	Entity e6(quad_mesh.get(), new_material, wall_tex, EntityType::TEXTURED_MODEL);
 	e6.translate(glm::vec3(-6.0, 2.0, -2.0));
 	
-	Entity e7(quad_mesh.get(), texture_material, wall_tex, EntityType::TEXTURED_MODEL);
-	e7.scale(glm::vec3(10,10,10));
-	e7.rotate(glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	Entity e7(quad_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
+	//e7.scale(glm::vec3(8,8,8));
+	//e7.rotate(glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	e7.translate(glm::vec3(0.0, 2.0, 0.0));
 	
-	Entity e8(line_mesh.get(), color_material, 0, EntityType::LINE);
-	e8.scale(glm::vec3(10,1,1));
+	Entity e8(line_mesh.get(), new_material, 0, EntityType::LINE);
+	e8.scale(glm::vec3(0.5f, 0.5f, 0.5f));
 	e8.rotate(glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
+	Entity e9(cube_mesh.get(), new_material, box_tex, EntityType::TEXTURED_MODEL);
+	//e9.scale(glm::vec3(2.0, 2.0, 2.0));
+	e9.translate(glm::vec3(0.0, 0.0, -20.0));
+
 	Scene scene;
-	scene.add(&e1);
-	scene.add(&e2);
-	scene.add(&e3);
-	scene.add(&e4);
-	scene.add(&e5);
-	scene.add(&e6);
-	scene.add(&e7);
-	scene.add(&e8);
+	scene.add_entity(&e1);
+	scene.add_entity(&e2);
+	scene.add_entity(&e3);
+	scene.add_entity(&e4);
+	scene.add_entity(&e5);
+	scene.add_entity(&e6);
+	scene.add_entity(&e7);
+	scene.add_entity(&e8);
+	scene.add_entity(&e9);
 	
-	constexpr int CUBE_MAX = 2048;
-	float x = -32.0f;
-	float z = -32.0f;
+	
+	constexpr int CUBE_MAX = 4096;
+	constexpr float offset = 32.0f;
+	constexpr float step = 1.0f;
+	float x = -offset;
+	float z = -offset;
 	for (int i = 0; i < CUBE_MAX; ++i) {
-		Entity* e = new Entity(cube_mesh.get(), texture_material, wall_tex, EntityType::TEXTURED_MODEL);
-		e->translate(glm::vec3(x, -2.0, z));
-		scene.entities.emplace_back(e);
-		x += 1.0f;
-		if (x >= 32.0f) {
-			x = -32.0f;
-			z += 1.0f;
+		Entity* e = new Entity(cube_mesh.get(), new_material, wall_tex, EntityType::TEXTURED_MODEL);
+		glm::vec3 bp(x, -2.0, z);
+		e->translate(bp);
+		e->set_base_position(bp);
+		scene.add_entity(e);
+		x += step;
+		if (x >= offset) {
+			x = -offset;
+			z += step;
 		}
 	}
 
-	MeshData teapot_mesh_data;
-	if (!load_obj("./models/sphere.obj", teapot_mesh_data)) {
-		std::cout << "Model load failed.\n";
-	}
-	auto teapot_mesh = std::make_unique<RMeshModel>(teapot_mesh_data);
-	Entity ent_teapot(teapot_mesh.get(), diffuse_material, 0, EntityType::UNTEXTURED_MODEL);
-	//ent_teapot.rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	ent_teapot.scale(glm::vec3(5.0f, 5.0f, 5.0f));
-	ent_teapot.translate(glm::vec3(-2.0f, 2.0f, -1.0f));
-	scene.entities.emplace_back(&ent_teapot);
+	// MeshData sphere_mesh_data;
+	// if (!load_obj("./models/cube.obj", sphere_mesh_data)) {
+	// 	std::cerr << "Model load failed.\n";
+	// }
+	// auto sphere_mesh = std::make_unique<RMeshModel>(sphere_mesh_data);
+	// Entity ent_sphere(sphere_mesh.get(), diffuse_material, 0, EntityType::UNTEXTURED_MODEL);
+	// //ent_teapot.rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	// ent_sphere.scale(glm::vec3(5.0f, 5.0f, 5.0f));
+	// ent_sphere.translate(glm::vec3(-2.0f, 2.0f, -1.0f));
+	// scene.add_entity(&ent_sphere);
 
-	MeshData suzanne_mesh_data;
-	if (!load_obj("./models/suzanne.obj", suzanne_mesh_data)) {
-		std::cout << "Model load failed.\n";
-	}
-	auto suzanne_mesh = std::make_unique<RMeshModel>(suzanne_mesh_data);
-	Entity ent_suzanne(suzanne_mesh.get(), diffuse_material, 0, EntityType::UNTEXTURED_MODEL);
-	ent_suzanne.scale(glm::vec3(5.0f, 5.0f, 5.0f));
-	ent_suzanne.translate(glm::vec3(2.0, 1.0, -3.0));
-	scene.entities.emplace_back(&ent_suzanne);
+	// MeshData suzanne_mesh_data;
+	// if (!load_obj("./models/suzanne.obj", suzanne_mesh_data)) {
+	// 	std::cerr << "Model load failed.\n";
+	// }
+	// auto suzanne_mesh = std::make_unique<RMeshModel>(suzanne_mesh_data);
+	// Entity ent_suzanne(suzanne_mesh.get(), diffuse_material, 0, EntityType::UNTEXTURED_MODEL);
+	// ent_suzanne.scale(glm::vec3(5.0f, 5.0f, 5.0f));
+	// ent_suzanne.translate(glm::vec3(5.0, 1.0, -3.0));
+	// scene.add_entity(&ent_suzanne);
 
+	// MeshData teapot_mesh_data;
+	// if (!load_obj("./models/teapot.obj", teapot_mesh_data)) {
+	// 	std::cerr << "Model load failed.\n";
+	// }
+	// auto teapot_mesh = std::make_unique<RMeshModel>(teapot_mesh_data);
+	// Entity ent_teapot(teapot_mesh.get(), texture_material, 0, EntityType::UNTEXTURED_MODEL);
+	// ent_teapot.scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	// ent_teapot.translate(glm::vec3(-20.0, 0.0, -15.0));
+	// scene.add_entity(&ent_teapot);
+
+
+	// auto light_mesh = std::make_unique<RMeshCube>();
+	// Entity ent_light(light_mesh.get(), color_material, 0, EntityType::LIGHT);
+	// ent_light.set_viewable_flag(false);
+	// scene.add_entity(&ent_light);
+
+	Light light(new_material, glm::vec3(0,0,0));
+	light.set_color(glm::vec3(1.0, 0.0, 0.0));
+	light.translate(glm::vec3(5.0f, 15.0f, 0.0f));
+	scene.add_light(&light);
 
 	////////////////
 
 	auto camera = Camera(
-		{0, 0, 15}, // pos
+		{0, 0, -5}, // pos
 		{0, 0, 0}, // lookat
 		{0, 1, 0}, // up
 		config::SCREEN_W,
 		config::SCREEN_H,
 		0.1f,
-		200.0f
+		1000.0f
 	);
 	camera.set_input(input.get());
 
@@ -180,6 +210,7 @@ int main() {
 	//////////////////
 
 	double val = 0.0;
+	double ang = 0.0;
 
 	while (device->run()) {
 		
@@ -197,45 +228,51 @@ int main() {
 		// frame_start = current_time;
 		
 		device->poll_events();
-		
-		if (accumulator > 0.2) {
-			accumulator = 0.2;
-			// update
+
+		if (input->get_left_mouse_button_state()) {
+			auto cursor = input->get_cursor_pos();
+			//std::cout << cur.xpos << ", " << cur.ypos << "\n";)
+			auto r = cast_ray(cursor, camera.get_projection(), camera.get_view());
+			//std::cout << r.x << ", " << r.y << ", " << r.z << std::endl;
+
+			int count = 0;
+			for (auto e : scene.get_entities()) {
+				bool b = ray_intersect_sphere(camera.get_camera_position(), r, e->get_base_position(), 1.0f);
+				if (b) {
+					//std::cout << "Cube " << count << " Intersection\n";
+					e->translate(glm::vec3(0.0, 1.0, 0.0));
+					break;
+				}
+				++count;
+				// bool q = ray_intersect_sphere(camera.get_camera_position(), r, glm::vec3(0.0, 2.0, 0.0), 1.0f);
+				// if (q) {
+				// 	std::cout << "Quad Intersection\n";
+				// }
+			}
 		}
 
-		accumulator -= delta;
+		// for (auto e : scene.get_entities()) {
+		// 	e->rotate(glm::radians(val), glm::vec3(0.0, 1.0, 0.0));
+		// }
 
-		mouse_cursor_pos mpos = input->get_cursor_pos();
-		//mpos.xpos = input->get_cursor_pos().xpos;
-		//mpos.ypos = input->get_cursor_pos().ypos;
-		//std::cout << mpos.xpos << " | " << mpos.ypos << "\n";
-		float x = float(config::SCREEN_W / 2 - mpos.xpos);
-		float y = float(config::SCREEN_H / 2 - mpos.ypos);
-		//std::cout << float(config::SCREEN_W / 2) - mpos.xpos << "\n";
-		//std::cout << "(" << x << "," << y << ")\n";
-		//camera.update_yaw(x);
-		//camera.update_pitch(y);
+		scene.entities[8]->rotate(glm::radians(val), glm::vec3(1.0,1.0,1.0));
+		scene.entities[scene.entities.size()-3]->rotate(glm::radians(glm::sin(val-1.5f)), glm::vec3(0.0,1.0,0.0));
+		scene.entities[scene.entities.size()-2]->rotate(glm::radians(val), glm::vec3(0.0,1.0,0.0));
 
-		Entity* t = scene.entities[scene.entities.size()-2];
-		//t->translate(glm::vec3(std::sin(val) * 5, 0.0f, 0.0f));
-		val += 0.01;
+		// for (auto l : scene.lights) {
+		// 	l->rotate(glm::radians(glm::sin(val)), glm::vec3(0.0,1.0,0.0));
+		// }
+		val = 1.0f;
+		//ang += 0.1;
 		camera.update(delta);
 
-		
 		video->begin_scene();
 
-
-		//glm::mat4 model_matrix = glm::mat4(1.0f);
-		//model_matrix_cube = glm::rotate(model_matrix_cube, -0.75f*(float)timer.current_time(), glm::vec3(0.0f, 0.0f, 1.0f));
-		//model_matrix_cube= glm::rotate(model_matrix_cube, -0.75f*(float)timer.current_time(), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		
 		video->renderer(camera, scene);
 
 		video->end_scene();
 
 		device->window_swap();
-
 	}
 
 	for (auto e : scene.entities) {
