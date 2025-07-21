@@ -5,7 +5,8 @@
 #include "config.h"
 #include "entity.h"
 #include "material.h"
-#include "renderable_mesh.h"
+#include "./mesh/renderable_mesh.h"
+#include "scene.h"
 #include "video.h"
 
 #include <GL/glew.h>
@@ -30,74 +31,62 @@ void VideoDriver::begin_scene() {
 }
 
 void VideoDriver::end_scene() {
+
 }
 
 
 
 void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 
+	// lights
+	
+	for (const auto light : scene.get_lights()) {
 
-	for (auto ent : scene.entities) {
-		glm::mat4 model_matrix = ent->get_model_matrix();
-		GLuint handle = ent->get_material().handle();
-		GLuint idx_count = ent->get_mesh()->get_index_count();
+		//shader.use_program("normals");
+		//GLuint lp = shader.get_uniform("light_pos");
+		//GLuint lc = shader.get_uniform("light_color");
 
-		//std::cout << "HANDLE: " << handle << "\n";
+		//GLuint handle = light->get_material().handle();
+		GLuint handle = light->get_material().get_shader("texture")->get_program();
 		glUseProgram(handle);
 
-		GLuint shader_id_model = glGetUniformLocation(handle, "model");
-		glUniformMatrix4fv(shader_id_model, 1, GL_FALSE, glm::value_ptr(model_matrix));
-		GLuint shader_id_view = glGetUniformLocation(handle, "view");
-		glUniformMatrix4fv(shader_id_view, 1, GL_FALSE, glm::value_ptr(camera.get_view()));
-		GLuint shader_id_projection = glGetUniformLocation(handle, "projection");
-		glUniformMatrix4fv(shader_id_projection, 1, GL_FALSE, glm::value_ptr(camera.get_projection()));
+		//glm::vec3 light_pos(10.0f, 8.0f, -10.0f);
+		glm::vec3 light_pos = light->get_position();
+		glm::vec3 light_color = light->get_color();
+		GLuint shader_light_pos = glGetUniformLocation(handle, "light_pos");
+		GLuint shader_light_color = glGetUniformLocation(handle, "light_color");
+		glUniform3fv(shader_light_pos, 1, glm::value_ptr(light_pos));
+		glUniform3fv(shader_light_color, 1, glm::value_ptr(light_color));
+		
+	}
+	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// models
+	
+	for (auto ent : scene.entities) {
 
-
-		GLuint texture_sampler;
-		auto texture_id = ent->get_texture();
+		auto* sh = ent->get_material().get_shader("texture");
+		//GLuint program = sh->get_program();
+		sh->use_program();
+		
+		glm::mat4 model_matrix = ent->get_model_matrix();
+	
+		sh->set_uniform("model", model_matrix);
+		sh->set_uniform("view", camera.get_view());
+		sh->set_uniform("projection", camera.get_projection());
+	
+		sh->set_texture("tex_sampler0", ent->get_texture(), GL_TEXTURE0);
+		
 		ent->get_mesh()->bind();
-		
-		EntityType ent_type = ent->get_type();
-		if (ent_type == EntityType::TEXTURED_MODEL) {
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-			if (texture_id == 1) {
-				texture_sampler = glGetUniformLocation(handle, "tex_sampler0");
-				glActiveTexture(GL_TEXTURE0);
-			}
-			else {
-				texture_sampler = glGetUniformLocation(handle, "tex_sampler1");
-				glActiveTexture(GL_TEXTURE1);
-			}
-			//glActiveTexture(GL_TEXTURE0 + texture_id);
-			glUniform1i(texture_sampler, GL_TEXTURE0 + texture_id);
-			//ent->get_mesh()->bind();
-			glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
-		}
-		else if (ent_type == EntityType::UNTEXTURED_MODEL) {
-			glm::vec3 light_pos(0.0f, 0.0f, -10.0f);
-			GLuint shader_light_pos = glGetUniformLocation(handle, "light_pos");
-			glUniform3fv(shader_light_pos, 1, glm::value_ptr(light_pos));
+		GLuint idx_count = ent->get_mesh()->get_index_count();
+		glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
 
-			//glUniform3f(handle, 0.0f, 1.0f, 0.0f);
-			
-			//glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
-			glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
-		}
-		else if (ent_type == EntityType::LIGHT) {
-			// get light's position and work with that
-			// glm::vec3 light_pos(0.0f, 0.0f, 10.0f);
-			// GLuint shader_light_pos = glGetUniformLocation(handle, "light_pos");
-			// glUniform3fv(handle, 1, glm::value_ptr(light_pos));
-		}
-		else if (ent_type == EntityType::LINE) {
-			glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
-		}
+		// else if (ent_type == EntityType::LINE) {
+		// 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
+		// }
 		
-		//ent->get_mesh()->bind();
-		//glUniform3f(handle, 0.0f, 1.0f, 0.0f);
-		//std::cout << "idx count: " << idx_count << "\n";
 		
 		ent->get_mesh()->unbind();
-		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
