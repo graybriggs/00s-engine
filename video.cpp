@@ -18,10 +18,12 @@
 
 void VideoDriver::setup() {
 
-	glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_ALWAYS);
 	glEnable(GL_DEBUG_OUTPUT);
+	//glDepthFunc(GL_LESS);
+	//glCullFace(GL_BACK);
 	//glEnable(GL_CULL_FACE);
-	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void VideoDriver::begin_scene() {
@@ -42,22 +44,14 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 	
 	for (const auto light : scene.get_lights()) {
 
-		//shader.use_program("normals");
-		//GLuint lp = shader.get_uniform("light_pos");
-		//GLuint lc = shader.get_uniform("light_color");
+		auto* sh = light->get_material().get_shader("texture");
+		sh->use_program();
 
-		//GLuint handle = light->get_material().handle();
-		GLuint handle = light->get_material().get_shader("texture")->get_program();
-		glUseProgram(handle);
 
-		//glm::vec3 light_pos(10.0f, 8.0f, -10.0f);
 		glm::vec3 light_pos = light->get_position();
 		glm::vec3 light_color = light->get_color();
-		GLuint shader_light_pos = glGetUniformLocation(handle, "light_pos");
-		GLuint shader_light_color = glGetUniformLocation(handle, "light_color");
-		glUniform3fv(shader_light_pos, 1, glm::value_ptr(light_pos));
-		glUniform3fv(shader_light_color, 1, glm::value_ptr(light_color));
-		
+		sh->set_uniform("light_pos", light_pos);
+		sh->set_uniform("light_color", light_color);				
 	}
 	
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
