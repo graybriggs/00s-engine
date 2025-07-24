@@ -8,6 +8,7 @@ list(
     ${dir}/mesh_line.cpp
     ${dir}/mesh_model.cpp
     ${dir}/mesh_quad.cpp
+    ${dir}/mesh_terrain.cpp
     ${dir}/mesh_triangle.cpp
     #${dir}/renderable_mesh.cpp
 )
