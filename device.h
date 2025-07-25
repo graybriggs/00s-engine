@@ -28,6 +28,7 @@ public:
 	void set_input(Input* in);
 
 	void set_window(GLFWwindow* win);
+	void set_window_name(const std::string& name);
 	GLFWwindow* get_window();
 
 private:

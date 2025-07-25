@@ -1,4 +1,5 @@
 
+#include "config.h"
 #include "device.h"
 #include "input.h"
 #include "key.h"
@@ -57,7 +58,7 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 
 
 	
-	GLFWwindow* window = glfwCreateWindow(screen_w, screen_h, "test", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(screen_w, screen_h, "Rendering Engine", nullptr, nullptr);
 	device->set_window(window);
 	if (device->get_window() == nullptr) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
@@ -71,6 +72,9 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 		//throw std::exception("failed to initialize glew");
 	}
 
+	//glfwSetInputMode(device->get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(device->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	//glfwSetInputMode(device->get_window(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	glfwSetInputMode(device->get_window(), GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetKeyCallback(device->get_window(), key_callback);
 	glfwSetCursorPosCallback(device->get_window(), cursor_position_callback);
@@ -101,6 +105,9 @@ GLFWwindow* Device::get_window() {
 	return window;
 }
 
+void Device::set_window_name(const std::string& name) {
+	glfwSetWindowTitle(get_window(), name.c_str());
+}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
@@ -160,11 +167,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-
+	
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
-	//printf("x: %f y: %f\n", x, y);
 	input->set_mouse_cursor(x, y);
+	//printf("x: %f y: %f\n", x, y);
+	
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	//width = config::SCREEN_W;
+	//height = config::SCREEN_H;
+	//std::cout << "Window w/h: " << width << ", " << height << "\n";
+	glfwSetCursorPos(window, width / 2, height / 2);
 }
 
 
