@@ -13,6 +13,9 @@
 
 #include "camera.h"
 #include "scene.h"
+#include "terrain_data.h"
+
+class RMeshTerrain;
 
 class VideoDriver {
 public:
@@ -22,7 +25,12 @@ public:
 	void begin_scene();
 	void end_scene();
 
+	void draw_points();
+	void draw_lines();
+	void draw_fill();
+
 	void renderer(const Camera& camera, const Scene& scene);
+	void terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat);
 
 private:
 

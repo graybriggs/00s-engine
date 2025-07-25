@@ -6,6 +6,8 @@
 #include "entity.h"
 #include "material.h"
 #include "./mesh/renderable_mesh.h"
+#include "./mesh/mesh_terrain.h"
+#include "terrain_data.h"
 #include "scene.h"
 #include "video.h"
 
@@ -20,7 +22,7 @@ void VideoDriver::setup() {
 
 	//glDepthFunc(GL_ALWAYS);
 	glEnable(GL_DEBUG_OUTPUT);
-	//glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS);
 	//glCullFace(GL_BACK);
 	//glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -36,6 +38,18 @@ void VideoDriver::end_scene() {
 
 }
 
+void VideoDriver::draw_points() {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+}
+
+void VideoDriver::draw_lines() {
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+
+void VideoDriver::draw_fill() {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
 
 
 void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
@@ -60,7 +74,8 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 	for (auto ent : scene.entities) {
 
 		auto* sh = ent->get_material().get_shader("texture");
-		//GLuint program = sh->get_program();
+		//auto* sh = ent->get_material().get_shader("color");
+		GLuint program = sh->get_program();
 		sh->use_program();
 		
 		glm::mat4 model_matrix = ent->get_model_matrix();
@@ -74,7 +89,7 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 		ent->get_mesh()->bind();
 		GLuint idx_count = ent->get_mesh()->get_index_count();
 		glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// else if (ent_type == EntityType::LINE) {
 		// 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
@@ -83,4 +98,21 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 		
 		ent->get_mesh()->unbind();
 	}
+}
+
+void VideoDriver::terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat) {
+
+	auto sh = mat.get_shader("color");
+	sh->use_program();
+
+	sh->set_uniform("model", glm::mat4(1.0));
+	sh->set_uniform("view", camera.get_view());
+	sh->set_uniform("projection", camera.get_projection());
+
+	rmt->bind();
+	for (int i = 0; i < trd.num_strips; ++i) {
+		glDrawElements(GL_TRIANGLE_STRIP, trd.num_verts_per_strip, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * trd.num_verts_per_strip * i));
+	}
+	rmt->unbind();
+
 }
