@@ -26,12 +26,14 @@ public:
     void translate(const glm::vec3& v);
     glm::vec3 calculate_direction();
     glm::vec3 calculate_forward();
+    glm::vec3 get_camera_position();
     glm::vec3 get_world_up();
     void update_yaw(float yaw);
     void update_pitch(float pitch);
     glm::vec3 calculate_camera_right();
     glm::vec3 calculate_camera_up();
     //glm::mat4 calculate_view();
+    void set_velocity(float vel);
     void update(double delta);
     void print_camera_position();
 
@@ -47,7 +49,7 @@ private:
     float cam_yaw{};
     float cam_pitch{};
     glm::vec3 camera_speed;
-    const float camera_velocity = 0.7f;
+    float camera_velocity;
     float camera_fov = 45.0f; // ? 100.0f;
     float mouse_speed = 0.005f;
     

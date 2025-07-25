@@ -30,7 +30,8 @@ Camera::Camera(
 	camera_position(glm::normalize(position)),
 	camera_direction(glm::vec3(0,0,0)),
 	cam_pitch(0.0f),
-	cam_yaw(0.0f) {
+	cam_yaw(0.0f),
+	camera_velocity(0.7f) {
 	
 
 	view = glm::lookAt(
@@ -80,12 +81,15 @@ glm::vec3 Camera::calculate_forward() {
 	return calculate_direction();
 }
 
+glm::vec3 Camera::get_camera_position() {
+	return camera_position;
+}
 
 void Camera::update_yaw(float yaw) {
 	cam_yaw += yaw;
 	//camera_direction = calculate_direction();
 	camera_direction = glm::normalize(calculate_forward());
-	view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
+	view = glm::lookAt(camera_position, camera_position + camera_direction, calculate_camera_up());
 }
 
 void Camera::update_pitch(float pitch) {
@@ -93,7 +97,7 @@ void Camera::update_pitch(float pitch) {
 	cam_pitch += pitch;
 	//camera_direction = calculate_direction();
 	camera_direction = glm::normalize(calculate_forward());
-	view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
+	view = glm::lookAt(camera_position, camera_position + camera_direction, calculate_camera_up());
 }
 
 glm::vec3 Camera::get_world_up() {
@@ -109,6 +113,9 @@ glm::vec3 Camera::calculate_camera_up() {
 	return glm::normalize(glm::cross(cam_right, camera_direction));
 }
 
+void Camera::set_velocity(const float vel) {
+	camera_velocity = vel;
+}
 
 void Camera::translate(const glm::vec3& vec) {
 
