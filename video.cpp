@@ -43,7 +43,6 @@ void VideoDriver::draw_points() {
 }
 
 void VideoDriver::draw_lines() {
-
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
@@ -51,9 +50,7 @@ void VideoDriver::draw_fill() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-
-void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
-
+void VideoDriver::light_renderer(const Camera& camera, const Scene& scene) {
 	// lights
 	
 	for (const auto light : scene.get_lights()) {
@@ -67,6 +64,11 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 		sh->set_uniform("light_pos", light_pos);
 		sh->set_uniform("light_color", light_color);				
 	}
+}
+
+
+void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene) {
+
 	
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	// models
@@ -74,6 +76,7 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 	for (auto ent : scene.entities) {
 
 		auto* sh = ent->get_material().get_shader("texture");
+		//auto* sh = ent->get_material().get_shader("normals");
 		//auto* sh = ent->get_material().get_shader("color");
 		GLuint program = sh->get_program();
 		sh->use_program();
@@ -94,15 +97,15 @@ void VideoDriver::renderer(const Camera& camera, const Scene& scene) {
 		// else if (ent_type == EntityType::LINE) {
 		// 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
 		// }
-		
-		
+				
 		ent->get_mesh()->unbind();
 	}
 }
 
 void VideoDriver::terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat) {
 
-	auto sh = mat.get_shader("color");
+	//auto sh = mat.get_shader("color");
+	auto sh = mat.get_shader("normals");
 	sh->use_program();
 
 	sh->set_uniform("model", glm::mat4(1.0));

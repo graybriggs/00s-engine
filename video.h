@@ -29,7 +29,8 @@ public:
 	void draw_lines();
 	void draw_fill();
 
-	void renderer(const Camera& camera, const Scene& scene);
+	void light_renderer(const Camera& camera, const Scene& scene);
+	void entity_renderer(const Camera& camera, const Scene& scene);
 	void terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat);
 
 private:
