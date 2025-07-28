@@ -16,6 +16,7 @@
 #include "terrain_data.h"
 
 class Material;
+class Shader;
 class RMeshTerrain;
 
 class VideoDriver {
