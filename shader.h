@@ -31,8 +31,9 @@ public:
 
 private:
     std::string load_shader(const std::string path);
+    void compile_msg(GLuint id);
     void compile_shader(const std::string& shader_code, ShaderType type);
-    void post_compile_check(GLuint shader_type);
+    void post_compile_check(GLuint shader_type, ShaderType type);
     void link_shader();
     void cleanup_shader();
 

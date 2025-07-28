@@ -3,8 +3,8 @@
 
 #include "texture.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -21,24 +21,24 @@
 Shader::Shader(const char* vs_path, const char* fs_path):
 	geometry_id(-1) {
 
-		auto vsc = load_shader(vs_path);
-		compile_shader(vsc, ShaderType::VERTEX);
-		auto fsc = load_shader(fs_path);
-		compile_shader(fsc, ShaderType::FRAGMENT);
-		link_shader();
-		cleanup_shader();
+	auto vsc = load_shader(vs_path);
+	compile_shader(vsc, ShaderType::VERTEX);
+	auto fsc = load_shader(fs_path);
+	compile_shader(fsc, ShaderType::FRAGMENT);
+	link_shader();
+	cleanup_shader();
 }
 
 Shader::Shader(const char* vs_path, const char* fs_path, const char* gs_path) {
 
-		auto vsc = load_shader(vs_path);
-		compile_shader(vsc, ShaderType::VERTEX);
-		auto fsc = load_shader(fs_path);
-		compile_shader(fsc, ShaderType::FRAGMENT);
-		auto gsc = load_shader(gs_path);
-		compile_shader(gsc, ShaderType::GEOMETRY);
-		link_shader();
-		cleanup_shader();
+	auto vsc = load_shader(vs_path);
+	compile_shader(vsc, ShaderType::VERTEX);
+	auto fsc = load_shader(fs_path);
+	compile_shader(fsc, ShaderType::FRAGMENT);
+	auto gsc = load_shader(gs_path);
+	compile_shader(gsc, ShaderType::GEOMETRY);
+	link_shader();
+	cleanup_shader();
 }
 
 void Shader::use_program() {
@@ -86,49 +86,64 @@ std::string Shader::load_shader(const std::string path) {
 	}
 	else {
 		std::cout << "Cannot open: " << path << "\n";
-		getchar();
+		//getchar();
 		//return 0;
 		throw std::runtime_error("Cannot open: " + std::string(path));
 	}
 }
 
+void Shader::compile_msg(GLuint id) {
+	std::cerr << "Compiling shader: " << shader_from_path << "Shader [#" << id << "]\n";
+}
+
 void Shader::compile_shader(const std::string& shader_code, ShaderType type) {
 
-	std::cout << "Compiling shader: " << shader_from_path << "\n";
+	
 	char const* source_ptr = shader_code.c_str();
 	
 	if (type == ShaderType::VERTEX) {
 		vertex_id = glCreateShader(GL_VERTEX_SHADER);
+		compile_msg(vertex_id);
 		glShaderSource(vertex_id, 1, &source_ptr, nullptr);
 		glCompileShader(vertex_id);
-		post_compile_check(vertex_id);
+		post_compile_check(vertex_id, ShaderType::VERTEX);
 	}
 	else if (type == ShaderType::GEOMETRY) {
 		geometry_id = glCreateShader(GL_GEOMETRY_SHADER);
+		compile_msg(geometry_id);
 		glShaderSource(geometry_id, 1, &source_ptr, nullptr);
 		glCompileShader(geometry_id);
-		post_compile_check(geometry_id);
+		post_compile_check(geometry_id, ShaderType::GEOMETRY);
 	}
 	else if (type == ShaderType::FRAGMENT) {
 		fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
+		compile_msg(fragment_id);
 		glShaderSource(fragment_id, 1, &source_ptr, nullptr);
 		glCompileShader(fragment_id);
-		post_compile_check(fragment_id);
+		post_compile_check(fragment_id, ShaderType::FRAGMENT);
 	}
 	
 	
 }
 
-void Shader::post_compile_check(GLuint shader_type) {
-	GLint result = GL_FALSE;
+void Shader::post_compile_check(GLuint shader_type, ShaderType type) {
+	GLint success = GL_FALSE;
 	int log_length;
 
-	glGetShaderiv(shader_type, GL_COMPILE_STATUS, &result);
+	glGetShaderiv(shader_type, GL_COMPILE_STATUS, &success);
 	glGetShaderiv(shader_type, GL_INFO_LOG_LENGTH, &log_length);
-	if (log_length > 0) {
+	if (!success) {
 		std::vector<char> error_message(log_length + 1);
-		glGetShaderInfoLog(program_id, log_length, nullptr, &error_message[0]);
-		std::cerr << "ShaderInfoLog: " << error_message.data() << "\n";
+		glGetShaderInfoLog(shader_type, log_length, nullptr, error_message.data());
+
+		std::string str;
+		if (type == ShaderType::VERTEX) str = "Vertex Shader";
+		else if (type == ShaderType::GEOMETRY) str = "Geometry Shader";
+		else if (type == ShaderType::FRAGMENT) str = "Fragment Shader";
+		else str = "No type";
+		
+		std::cout << "MESSAGE SIZE: " << error_message.size() << error_message[0] << "\n";
+		std::cerr << "ERROR: [" << shader_type << "] " << str << " - ShaderInfoLog(compile): " << error_message.data() << "\n";
 	}
 	else {
 		std::cout << "Shader: " << shader_type << " compiled OK\n";
@@ -152,12 +167,12 @@ void Shader::link_shader() {
 	GLint result = GL_FALSE;
 	int info_log_length;
 
-    glGetProgramiv(program_id, GL_LINK_STATUS, &result);
+	glGetProgramiv(program_id, GL_LINK_STATUS, &result);
 	glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &info_log_length);
 	if (info_log_length > 0) {
 		std::vector<char> error_message(info_log_length + 1);
 		glGetProgramInfoLog(program_id, info_log_length, nullptr, &error_message[0]);
-		std::cerr << "ShaderInfoLog: " << error_message.data() << "\n";
+		std::cerr << "ShaderInfoLog(linker): " << error_message.data() << "\n";
 	}
 	else {
 		std::cout << "Shader: " << program_id << " linked OK\n";
@@ -165,7 +180,7 @@ void Shader::link_shader() {
 }
 
 void Shader::cleanup_shader() {
-    glDetachShader(program_id, vertex_id);
+	glDetachShader(program_id, vertex_id);
 	glDetachShader(program_id, fragment_id);
 
 	if (geometry_id > 0) {
