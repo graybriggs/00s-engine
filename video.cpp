@@ -67,7 +67,7 @@ void VideoDriver::light_renderer(const Camera& camera, const Scene& scene) {
 }
 
 
-void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene) {
+void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene, Shader* override) {
 
 	
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -75,9 +75,15 @@ void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene) {
 	
 	for (auto ent : scene.entities) {
 
-		auto* sh = ent->get_material().get_shader("texture");
-		//auto* sh = ent->get_material().get_shader("normals");
-		//auto* sh = ent->get_material().get_shader("color");
+		Shader* sh = nullptr;
+
+		if (override != nullptr) {
+			sh = override;
+		}
+		else {
+			sh = ent->get_material().get_shader("texture");
+			//sh = ent->get_material().get_shader("color");
+		}
 		GLuint program = sh->get_program();
 		sh->use_program();
 		
@@ -105,7 +111,7 @@ void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene) {
 void VideoDriver::terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat) {
 
 	//auto sh = mat.get_shader("color");
-	auto sh = mat.get_shader("normals");
+	auto sh = mat.get_shader("color");
 	sh->use_program();
 
 	sh->set_uniform("model", glm::mat4(1.0));
@@ -117,5 +123,5 @@ void VideoDriver::terrain_renderer(const Camera& camera, const RMeshTerrain* rmt
 		glDrawElements(GL_TRIANGLE_STRIP, trd.num_verts_per_strip, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * trd.num_verts_per_strip * i));
 	}
 	rmt->unbind();
-
 }
+

@@ -15,6 +15,7 @@
 #include "scene.h"
 #include "terrain_data.h"
 
+class Material;
 class RMeshTerrain;
 
 class VideoDriver {
@@ -30,10 +31,9 @@ public:
 	void draw_fill();
 
 	void light_renderer(const Camera& camera, const Scene& scene);
-	void entity_renderer(const Camera& camera, const Scene& scene);
+	void entity_renderer(const Camera& camera, const Scene& scene, Shader* override = nullptr);
 	void terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat);
 
 private:
-
 };
 
