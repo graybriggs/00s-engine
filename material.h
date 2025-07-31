@@ -29,8 +29,8 @@ public:
 
     Shader* get_shader_from_material(MaterialType type);
 
-    void add_shader(std::string name, Shader* shader);
-    Shader* get_shader(std::string name);
+    void add_shader(const std::string& name, Shader* shader);
+    Shader* get_shader(const std::string& name);
 
 private:
     Shader* shader;

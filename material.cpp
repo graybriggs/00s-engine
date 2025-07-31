@@ -9,11 +9,11 @@
 
 #include "material.h"
 
-void Material::add_shader(std::string name, Shader* sh) {
+void Material::add_shader(const std::string& name, Shader* sh) {
 	shaders[name] = sh;
 }
 
-Shader* Material::get_shader(std::string name) {
+Shader* Material::get_shader(const std::string& name) {
 
 	 return shaders[name];
 }
