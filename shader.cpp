@@ -49,17 +49,33 @@ GLuint Shader::get_program() const {
 	return program_id;
 }
 
-void Shader::set_uniform(std::string id, glm::vec3 v3) {
+void Shader::set_uniform(const std::string& id, glm::vec3 v3) {
 	GLuint uniform_location = glGetUniformLocation(program_id, id.c_str());
 	glUniform3fv(uniform_location, 1, glm::value_ptr(v3));
 }
 
-void Shader::set_uniform(std::string id, glm::mat4 m4) {
+void Shader::set_uniform(const std::string& id, glm::mat4 m4) {
 	GLuint uniform_location = glGetUniformLocation(program_id, id.c_str());
 	glUniformMatrix4fv(uniform_location, 1, GL_FALSE, glm::value_ptr(m4));
 }
 
-void Shader::set_texture(std::string name, Texture texture, GLenum texture_unit) {
+void Shader::set_color(int col) {
+	GLuint uniform_location = glGetUniformLocation(program_id, "base_color");
+	if (uniform_location != -1) {
+		if (col == 0) // red
+			glUniform1i(uniform_location, 0);
+		else if (col == 1) // green
+			glUniform1i(uniform_location, 1);
+		else if (col == 2) // blue
+			glUniform1i(uniform_location, 2);
+		else if (col == 3) // white
+			glUniform1i(uniform_location, 3);
+		else // vertex colors
+			glUniform1i(uniform_location, -1);
+	}
+}
+
+void Shader::set_texture(const std::string& name, Texture texture, GLenum texture_unit) {
 	auto texture_id = texture.get_id();
 	glActiveTexture(texture_unit);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -72,7 +88,7 @@ void Shader::set_texture(std::string name, Texture texture, GLenum texture_unit)
 // private methods
 ///
 
-std::string Shader::load_shader(const std::string path) {
+std::string Shader::load_shader(const std::string& path) {
 	// read from file
 	shader_from_path = path;
 	std::string shader_code;

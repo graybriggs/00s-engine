@@ -23,14 +23,15 @@ public:
     Shader(const char* vs_path, const char* fs_path, const char* gs_path);
 
     void use_program();
-    void set_uniform(std::string id, glm::vec3 v);
-    void set_uniform(std::string id, glm::mat4 m4);
+    void set_uniform(const std::string& id, glm::vec3 v);
+    void set_uniform(const std::string& id, glm::mat4 m4);
+    void set_color(int col);
+    void set_texture(const std::string& name, Texture texture, GLenum texture_unit);
 
-    void set_texture(std::string name, Texture texture, GLenum texture_unit);
     GLuint get_program() const;
 
 private:
-    std::string load_shader(const std::string path);
+    std::string load_shader(const std::string& path);
     void compile_msg(GLuint id);
     void compile_shader(const std::string& shader_code, ShaderType type);
     void post_compile_check(GLuint shader_type, ShaderType type);
