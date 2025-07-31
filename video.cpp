@@ -111,7 +111,7 @@ void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene, Shad
 void VideoDriver::terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat) {
 
 	//auto sh = mat.get_shader("color");
-	auto sh = mat.get_shader("color");
+	auto sh = mat.get_shader("terrain");
 	sh->use_program();
 
 	sh->set_uniform("model", glm::mat4(1.0));
