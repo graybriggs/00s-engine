@@ -21,8 +21,10 @@ add_subdirectory(mesh)
 
 set(SOURCES
     camera.cpp
+    composite_entity.cpp
     device.cpp
     entity.cpp
+    heightmap.cpp
     input.cpp
     light.cpp
     main.cpp
@@ -32,12 +34,14 @@ set(SOURCES
     mesh/mesh_line.cpp
     mesh/mesh_model.cpp
     mesh/mesh_quad.cpp
+    mesh/mesh_terrain.cpp
     mesh/mesh_triangle.cpp
     mesh/renderable_mesh.cpp
     model_loader.cpp
     ray.cpp
     scene.cpp
     shader.cpp
+    standard_entity.cpp
     stb_image.cpp
     texture.cpp
     texture_loader.cpp
