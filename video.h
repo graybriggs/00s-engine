@@ -33,8 +33,11 @@ public:
 
 	void light_renderer(const Camera& camera, const Scene& scene);
 	void entity_renderer(const Camera& camera, const Scene& scene, Shader* override = nullptr);
+	void composite_entity_renderer(const Camera& camera, const Scene& scene, Shader* override = nullptr);
 	void terrain_renderer(const Camera& camera, const RMeshTerrain* rmt, const TerrainRenderData& trd, Material& mat);
 
 private:
+
+	void render_composite(const Camera& camera, const CompositeEntity* entity);
 };
 

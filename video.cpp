@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "config.h"
+#include "composite_entity.h"
 #include "entity.h"
 #include "material.h"
 #include "./mesh/renderable_mesh.h"
@@ -76,35 +77,84 @@ void VideoDriver::entity_renderer(const Camera& camera, const Scene& scene, Shad
 	for (auto ent : scene.entities) {
 
 		Shader* sh = nullptr;
-
+		
 		if (override != nullptr) {
 			sh = override;
+			sh->use_program();
 		}
-		else {
+		else if (ent->get_type() == EntityType::TEXTURED_MODEL) {			
 			sh = ent->get_material().get_shader("texture");
-			//sh = ent->get_material().get_shader("color");
+			sh->use_program();
+			sh->set_texture("tex_sampler0", ent->get_texture(), GL_TEXTURE0);
 		}
-		GLuint program = sh->get_program();
-		sh->use_program();
-		
-		glm::mat4 model_matrix = ent->get_model_matrix();
-	
+		else if (ent->get_type() == EntityType::UNTEXTURED_MODEL) {
+			sh = ent->get_material().get_shader("color");
+			sh->use_program();
+			int bc = ent->get_base_color();
+			sh->set_color(bc);
+		}
+
+		const glm::mat4 model_matrix = ent->get_model_matrix();	
 		sh->set_uniform("model", model_matrix);
 		sh->set_uniform("view", camera.get_view());
 		sh->set_uniform("projection", camera.get_projection());
-	
-		sh->set_texture("tex_sampler0", ent->get_texture(), GL_TEXTURE0);
 		
 		ent->get_mesh()->bind();
-		GLuint idx_count = ent->get_mesh()->get_index_count();
+		
+		if (ent->get_type() == EntityType::LINE) {
+			glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
+		}
+		else {
+			GLuint idx_count = ent->get_mesh()->get_index_count();
+			glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+		
+		ent->get_mesh()->unbind();
+	
+	}
+}
+
+
+void VideoDriver::composite_entity_renderer(const Camera& camera, const Scene& scene, Shader* override) {
+
+	const auto ce = scene.get_composite_entities();
+	if (ce.size() > 0) {
+		for (const auto comp : ce) {
+			render_composite(camera, comp);
+		}
+	}
+
+}
+
+void VideoDriver::render_composite(const Camera& camera, const CompositeEntity* comp) {
+		
+	// store the parent model matrix
+	// iterate over the children, multiplying each child model matrix by the parent matrix
+
+	auto parent_model = comp->get_model_matrix();
+
+	auto children = comp->get_children();
+
+	for (auto child : children) {
+		auto sh = child->get_material().get_shader("color");
+		sh->use_program();
+		int bc = child->get_base_color();
+		sh->set_color(bc);
+
+		const glm::mat4 model_matrix = parent_model * child->get_model_matrix();	
+		sh->set_uniform("model", model_matrix);
+		sh->set_uniform("view", camera.get_view());
+		sh->set_uniform("projection", camera.get_projection());
+		
+		child->get_mesh()->bind();
+
+		GLuint idx_count = child->get_mesh()->get_index_count();
 		glDrawElements(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)0);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		// else if (ent_type == EntityType::LINE) {
-		// 	glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, (void*)0);
-		// }
-				
-		ent->get_mesh()->unbind();
+		
+		child->get_mesh()->unbind();
+		
 	}
 }
 
