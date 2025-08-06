@@ -7,9 +7,17 @@
 //     Entity(m, mat, tex, et)
 //     {}
 
-CompositeEntity::CompositeEntity(std::initializer_list<Entity*> values):
-    children(values)
-{
+// CompositeEntity::CompositeEntity(std::initializer_list<CompositeEntity*> values):
+//     children(values)
+// {
+// }
+
+CompositeEntity::CompositeEntity():
+    model(1.0)
+{}
+
+void CompositeEntity::set_model_matrix(const glm::mat4& m) {
+    model = m;
 }
 
 void CompositeEntity::add_child(Entity* child) {
