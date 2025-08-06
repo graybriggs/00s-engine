@@ -9,6 +9,7 @@
 struct Scene {
 
     void add_entity(Entity* entity);
+    void add_composite_entity(CompositeEntity* entity);
     void add_light(Light* light);
 
     std::vector<Entity*> get_entities() const;

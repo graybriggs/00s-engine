@@ -7,6 +7,10 @@ void Scene::add_entity(Entity* entity) {
     entities.emplace_back(entity);
 }
 
+void Scene::add_composite_entity(CompositeEntity* ce) {
+    composite_entities.push_back(ce);
+}
+
 void Scene::add_light(Light* light) {
     lights.emplace_back(light);
 }
