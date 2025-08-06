@@ -41,7 +41,6 @@ set(SOURCES
     ray.cpp
     scene.cpp
     shader.cpp
-    standard_entity.cpp
     stb_image.cpp
     texture.cpp
     texture_loader.cpp
