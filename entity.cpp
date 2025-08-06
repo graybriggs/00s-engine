@@ -20,7 +20,7 @@ Material Entity::get_material() const {
     return material;
 }
 
-void Entity::set_material(Material mat) {
+void Entity::set_material(const Material mat) {
     material = mat;
 }
 
@@ -28,15 +28,19 @@ glm::mat4 Entity::get_model_matrix() const {
     return model;
 }
 
+glm::vec3 Entity::get_3d_coords() const {
+    return glm::vec3(model[3][0], model[3][1], model[3][2]);
+}
+
 glm::vec3 Entity::get_base_position() const {
     return base_position;
 }
 
-void Entity::set_model_matrix(glm::mat4 mm) {
+void Entity::set_model_matrix(const glm::mat4 mm) {
     model = mm;
 }
 
-void Entity::set_texture(GLuint tex) {
+void Entity::set_texture(const GLuint tex) {
     texture = tex;
 }
 

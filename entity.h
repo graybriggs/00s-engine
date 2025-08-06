@@ -32,10 +32,11 @@ public:
 	//Entity(const RMesh* m, const Material mat, const glm::mat4 model, GLuint tex);
 	//Entity(const RMesh* m, const Material mat, const glm::mat4 model, Texture tex, EntityType et);
 	Entity(const RMesh* m, const Material mat, Texture tex, EntityType et);
+	~Entity() = default;
 
-	void set_material(Material mat);
-	void set_model_matrix(glm::mat4 mm);
-	void set_texture(GLuint tex);
+	void set_material(const Material mat);
+	void set_model_matrix(const glm::mat4 mm);
+	void set_texture(const GLuint tex);
 	void set_viewable_flag(const bool b);
 	void set_base_position(const glm::vec3 pos);
 	void set_base_color(const EntityBaseColor col);
@@ -46,15 +47,18 @@ public:
 	const RMesh* get_mesh() const;
 	Material get_material() const;
 	glm::mat4 get_model_matrix() const;
+	glm::vec3 get_3d_coords() const;
 	glm::vec3 get_base_position() const;
 	int get_base_color() const;
 	Texture get_texture() const;
 	EntityType get_type() const;
 	bool is_viewable() const;
 
+	// behavior
 	void scale(glm::vec3 factor);
 	void translate(glm::vec3 units);
 	void rotate(float, glm::vec3 axis);
+
 
 	
 private:
