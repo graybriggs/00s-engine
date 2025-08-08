@@ -81,6 +81,8 @@ std::unique_ptr<Device> makeDevice(int screen_w, int screen_h) {
 	glfwSetCursorPosCallback(device->get_window(), cursor_position_callback);
 	glfwSetMouseButtonCallback(device->get_window(), mouse_button_callback);
 
+	device->set_fps_mode(false);
+
 	return device;
 }
 
@@ -100,6 +102,14 @@ void Device::set_input(Input* in) {
 
 void Device::set_window(GLFWwindow* win) {
 	window = win;
+}
+
+void Device::set_fps_mode(bool b) {
+	fps_mode = b;
+}
+
+bool Device::get_is_fps_mode() const {
+	return fps_mode;
 }
 
 GLFWwindow* Device::get_window() {
@@ -199,6 +209,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
+	Device* device = static_cast<Device*>(glfwGetWindowUserPointer(window));
 	
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
@@ -213,7 +224,10 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	//width = config::SCREEN_W;
 	//height = config::SCREEN_H;
 	//std::cout << "Window w/h: " << width << ", " << height << "\n";
-	glfwSetCursorPos(window, width / 2, height / 2);
+
+	if (device->get_is_fps_mode()) {
+		//glfwSetCursorPos(window, width / 2, height / 2);
+	}
 }
 
 

@@ -29,11 +29,14 @@ public:
 
 	void set_window(GLFWwindow* win);
 	void set_window_name(const std::string& name);
+	void set_fps_mode(bool b);
+	bool get_is_fps_mode() const;
 	GLFWwindow* get_window();
 
 private:
 	GLFWwindow* window;
-	Input* input;	
+	Input* input;
+	bool fps_mode;
 };
 
 std::unique_ptr<Device> makeDevice(int screen_w, int screen_h);
