@@ -4,8 +4,22 @@
 #include "input.h"
 
 #include <glm/glm.hpp>
-#include <glm/mat4x4.hpp>
 
-glm::vec4 cast_ray(mouse_cursor_pos mcp, glm::mat4 projection, glm::mat4 view);
+struct NDC {
+    float x;
+    float y;
+};
 
-bool ray_intersect_sphere(glm::vec3 ray_origin, glm::vec3 ray_dir, glm::vec3 sphere_center, float sphere_radius);
+struct Ray {
+    glm::vec4 origin;
+    glm::vec4 direction;
+};
+
+struct Sphere {
+    glm::vec3 center;
+    float radius;
+};
+
+NDC get_ndc_from_click(const mouse_cursor_pos& mcp);
+Ray cast_ray(const mouse_cursor_pos mcp, const glm::mat4& projection, const glm::mat4& view);
+bool ray_intersect_sphere(const Ray& ray, const Sphere& sphere);
