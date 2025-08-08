@@ -11,7 +11,7 @@ enum class KeyPress {
     NUM7,
     NUM8,
     NUM9,
-    A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,W,X,Y,Z,
+    A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,W,X,Y,Z,
     UP,
     DOWN,
     LEFT,
