@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "video.h"
 
+#include <cmath>
 #include <exception>
 #include <iostream>
 #include <string>
@@ -128,6 +129,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
 		input->key[static_cast<int>(Key::KeyPress::A)] = true;
 	}
+	if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::B)] = true;
+	}
 	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
 		input->key[static_cast<int>(Key::KeyPress::S)] = true;
 	}
@@ -167,6 +171,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
 		input->key[static_cast<int>(Key::KeyPress::A)] = false;
 	}
+	if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::B)] = true;
+	}
 	if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
 		input->key[static_cast<int>(Key::KeyPress::S)] = false;
 	}
@@ -195,7 +202,10 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	
 	double x, y;
 	glfwGetCursorPos(window, &x, &y);
-	input->set_mouse_cursor(x, y);
+	input->set_mouse_cursor(
+		static_cast<int>(std::floor(x)),
+		static_cast<int>(std::floor(y))
+	);
 	//printf("x: %f y: %f\n", x, y);
 	
 	int width, height;
