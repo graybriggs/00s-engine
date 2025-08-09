@@ -148,8 +148,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
 		input->key[static_cast<int>(Key::KeyPress::D)] = true;
 	}
+	if (key == GLFW_KEY_H && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::H)] = true;
+	}
+	if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::J)] = true;
+	}
 	if (key == GLFW_KEY_N && action == GLFW_PRESS) {
 		input->key[static_cast<int>(Key::KeyPress::N)] = true;
+	}
+	if (key == GLFW_KEY_N && action == GLFW_PRESS) {
+		input->key[static_cast<int>(Key::KeyPress::U)] = true;
 	}
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		input->key[static_cast<int>(Key::KeyPress::UP)] = true;
@@ -190,8 +199,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
 		input->key[static_cast<int>(Key::KeyPress::D)] = false;
 	}
+	if (key == GLFW_KEY_H && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::H)] = false;
+	}
+	if (key == GLFW_KEY_J && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::J)] = false;
+	}
 	if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
 		input->key[static_cast<int>(Key::KeyPress::N)] = false;
+	}
+	if (key == GLFW_KEY_U && action == GLFW_RELEASE) {
+		input->key[static_cast<int>(Key::KeyPress::U)] = false;
 	}
 	if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
 		input->key[static_cast<int>(Key::KeyPress::UP)] = false;
@@ -226,7 +244,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	//std::cout << "Window w/h: " << width << ", " << height << "\n";
 
 	if (device->get_is_fps_mode()) {
-		//glfwSetCursorPos(window, width / 2, height / 2);
+		glfwSetCursorPos(window, width / 2, height / 2);
 	}
 }
 
