@@ -3,9 +3,10 @@
 
 #include <iostream>
 
-Input::Input()
+Input::Input():
+    left_mouse_click(false),
+    right_mouse_click(false)
 {
-    left_mouse_click = false;
 }
 
 // perhaps keep this as type double in device and convert here??
@@ -29,7 +30,19 @@ void Input::set_left_mouse_release() {
     left_mouse_click = false;
 }
 
-bool Input::get_left_mouse_button_state() {
+void Input::set_right_mouse_click() {
+    right_mouse_click = true;
+}
+
+void Input::set_right_mouse_release() {
+    right_mouse_click = false;
+}
+
+
+bool Input::get_left_mouse_button_state() const {
     return left_mouse_click;
 }
 
+bool Input::get_right_mouse_button_state() const {
+    return right_mouse_click;
+}
