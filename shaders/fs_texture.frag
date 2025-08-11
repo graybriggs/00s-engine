@@ -14,6 +14,7 @@ uniform sampler2D tex_sampler0;
 
 uniform vec3 light_pos;
 uniform vec3 light_color;
+uniform bool highlight;
 
 void main(){
 
@@ -38,6 +39,9 @@ void main(){
 
     vec3 res_t1 = luminance * (ambient_color + diffuse) * tex_color;// / distance * distance;
 
+    if (highlight) {
+        res_t1 = mix(res_t1, vec3(1.0, 0.0, 0.0), 0.2);
+    }
 	color = vec4(res_t1, 1.0);
 	//color = texture(tex_sampler0, uv_coords);// * vec4(res,1.0);
 	//color = texture(tex_sampler1, uv_coords) * vec4(res, 1.0);
