@@ -295,10 +295,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	Input* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		//printf("%i %i %i\n", button, action, mods);
 		input->set_left_mouse_click();
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 		input->set_left_mouse_release();
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		input->set_right_mouse_click();
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+		input->set_right_mouse_release();
 	}
 }
