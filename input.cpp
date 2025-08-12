@@ -1,6 +1,7 @@
 
 #include "input.h"
 
+#include <algorithm>
 #include <iostream>
 
 Input::Input():
@@ -45,4 +46,9 @@ bool Input::get_left_mouse_button_state() const {
 
 bool Input::get_right_mouse_button_state() const {
     return right_mouse_click;
+}
+
+void Input::update() {
+
+    std::copy(std::begin(key), std::end(key), std::begin(previous_key));
 }
