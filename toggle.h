@@ -6,4 +6,4 @@ struct Toggles {
     bool wireframe = false;
 };
 
-void check_toggle_key(Input* input, Toggles& toggles);
+void check_toggle_key(const Input* input, Toggles& toggles);

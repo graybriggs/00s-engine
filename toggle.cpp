@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-void check_toggle_key(Input* input, Toggles& toggles) {
+void check_toggle_key(const Input* input, Toggles& toggles) {
     if (input->key[Key_N] && !input->previous_key[Key_N]) {
         if (toggles.display_normals) {
             toggles.display_normals = false;
