@@ -40,11 +40,13 @@ set(SOURCES
     model_loader.cpp
     ray.cpp
     scene.cpp
+    selection_axis.cpp
     shader.cpp
     stb_image.cpp
     texture.cpp
     texture_loader.cpp
     timer.cpp
+    toggle.cpp
     util/array2d.cpp
     video.cpp
 )
