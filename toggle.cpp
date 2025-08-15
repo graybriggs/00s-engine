@@ -36,4 +36,14 @@ void check_toggle_key(const Input* input, Toggles& toggles) {
             std::cout << "Wireframe mode: ON\n";
         }
     }
+    if (input->key[Key_T] && !input->previous_key[Key_T]) {
+        if (toggles.terrain_edit) {
+            toggles.terrain_edit = false;
+            std::cout << "Terrain Edit mode: OFF\n";
+        }
+        else {
+            toggles.terrain_edit = true;
+            std::cout << "Terrain Edit mode: ON\n";
+        }
+    }
 }
