@@ -122,7 +122,6 @@ void Camera::translate(const glm::vec3& vec) {
 	camera_position += vec;
 	camera_direction = calculate_direction(); // look_at
 
-
 	print_camera_position();
 	
 	camera_right = glm::normalize(glm::cross(camera_direction, WORLD_UP));
@@ -144,7 +143,7 @@ void Camera::update(double delta) {
 	//print_camera_position();
 
 
-	if (input->key[static_cast<int>(Key::KeyPress::W)]) {
+	if (input->key[Key_W]) {
 		//glm::vec3 movement_velocity(0.0f, 0.0f, 1.0f);
 		//translate(glm::normalize(movement_velocity));
 
@@ -164,7 +163,7 @@ void Camera::update(double delta) {
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}		
-	if (input->key[static_cast<int>(Key::KeyPress::A)]) {
+	if (input->key[Key_A]) {
 
 		camera_direction = glm::normalize(calculate_forward()); // temp: this stops nan bug
 
@@ -175,7 +174,7 @@ void Camera::update(double delta) {
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
-	if (input->key[static_cast<int>(Key::KeyPress::D)]) {
+	if (input->key[Key_D]) {
 
 		camera_direction = glm::normalize(calculate_forward()); // temp: this stops nan bug
 
@@ -186,7 +185,7 @@ void Camera::update(double delta) {
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
-	if (input->key[static_cast<int>(Key::KeyPress::RIGHT)]) {
+	if (input->key[Key_RIGHT]) {
 		cam_yaw -= 0.03f;
 		
 		camera_direction = glm::normalize(calculate_forward());
@@ -199,14 +198,14 @@ void Camera::update(double delta) {
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
-	if (input->key[static_cast<int>(Key::KeyPress::UP)]) {
+	if (input->key[Key_UP]) {
 		cam_pitch -= 0.01f;
 
 		camera_direction = glm::normalize(calculate_forward());
 
 		view = glm::lookAt(camera_position, camera_position + camera_direction, glm::vec3(0,1,0));
 	}
-	if (input->key[static_cast<int>(Key::KeyPress::DOWN)]) {
+	if (input->key[Key_DOWN]) {
 		cam_pitch += 0.01f;
 
 		camera_direction = glm::normalize(calculate_forward());
