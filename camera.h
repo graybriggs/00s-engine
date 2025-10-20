@@ -25,7 +25,6 @@ public:
     void set_input(Input* in);
     void translate(const glm::vec3& v);
     glm::vec3 calculate_direction();
-    glm::vec3 calculate_forward();
     glm::vec3 get_camera_position();
     glm::vec3 get_world_up();
     void update_yaw(float yaw);
